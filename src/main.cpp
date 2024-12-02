@@ -1,10 +1,33 @@
 #include "common.h"
 #include "FrameBuffer.h"
 #include "Camera.h"
+#include "ClientSession.h"
+#include "VideoCapture"
+#include <thread>
 
 int main() {
-//
-  try {
+    // Start RTSP Server
+    std::thread([]() -> void
+                {
+        while(1){
+            std::pair<int, std::string> newClient = TCPHandler::GetInstance().AcceptClientConnection();
+            std::cout::<<"Client connected" << std::endl;
+
+            ClientSession* clientSession = new ClientSession(newClient);
+            clientSession->StartRequestHandlerThread();
+        } })
+        .detach();
+
+    
+    //**** TODO : example) rtsp로 전송할 이미지를 VideoCapture Queue로 던지기 ***** */
+    std::pair<const unsigned char*, const unsigned int> cur_frame = h264_file->get_next_frame();
+    unsigned char* ptr_cur_frame = cur_frame.first;
+    unsgined int cur_frame_size = cur_frame.second;
+    VideoCapture::getInstance().pushImg((unsigned char *)ptr_cur_frame, cur_frame_size);
+    //********************************************************* */
+    
+    try
+    {
         FrameBuffer framebuffer;
         Camera camera;
         // camera.checkFormat();
