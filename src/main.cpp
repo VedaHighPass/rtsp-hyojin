@@ -5,8 +5,6 @@
 
 int main() {
     try {
-
-
         const int width = 3264;  // 이미지의 가로 크기
         const int height = 2464; // 이미지의 세로 크기
 
@@ -16,76 +14,93 @@ int main() {
             throw std::runtime_error("Failed to load test image.");
         }
 
-//         // 입력 이미지를 GPU로 업로드
-//         cv::cuda::GpuMat gpuRGB;
-//         gpuRGB.upload(inputRGB);
-//
-//         // CUDA YUV420p 변환 결과 저장할 변수
-//         cv::cuda::GpuMat gpuY, gpuU, gpuV;
-//
-//         // GPU에서 RGB -> YUV420p 변환 수행
-//         rgbToYUV420pCUDA(gpuRGB, gpuY, gpuU, gpuV);
-//
-//         // GPU 결과를 CPU로 다운로드
-//         cv::Mat yPlane, uPlane, vPlane;
-//         gpuY.download(yPlane);
-//         gpuU.download(uPlane);
-//         gpuV.download(vPlane);
-//
-//         // YUV420p 데이터를 하나의 연속된 Mat로 병합
-//         cv::Mat yuv420p(yPlane.rows * 3 / 2, yPlane.cols, CV_8UC1);
-//         memcpy(yuv420p.data, yPlane.data, yPlane.rows * yPlane.cols);
-//         memcpy(yuv420p.data + yPlane.rows * yPlane.cols, uPlane.data, uPlane.rows * uPlane.cols);
-//         memcpy(yuv420p.data + yPlane.rows * yPlane.cols + uPlane.rows * uPlane.cols, vPlane.data, vPlane.rows * uPlane.cols);
-//
+        // ===== CUDA 변환 =====
+        cv::cuda::GpuMat gpuRGB, gpuY, gpuU, gpuV;
+        gpuRGB.upload(inputRGB);
 
-            // OpenCV G-API로 YUV420P 변환 그래프 설정
+        // CUDA YUV420p 변환 수행
+        rgbToYUV420pCUDA(gpuRGB, gpuY, gpuU, gpuV);
+
+        // GPU 결과를 CPU로 다운로드
+        cv::Mat cudaY, cudaU, cudaV;
+        gpuY.download(cudaY);
+        gpuU.download(cudaU);
+        gpuV.download(cudaV);
+
+        // CUDA YUV420p 데이터를 병합
+        cv::Mat cudaYUV420p(cudaY.rows * 3 / 2, cudaY.cols, CV_8UC1);
+        memcpy(cudaYUV420p.data, cudaY.data, cudaY.rows * cudaY.cols);
+        memcpy(cudaYUV420p.data + cudaY.rows * cudaY.cols, cudaU.data, cudaU.rows * cudaU.cols);
+        memcpy(cudaYUV420p.data + cudaY.rows * cudaY.cols + cudaU.rows * cudaU.cols, cudaV.data, cudaV.rows * cudaV.cols);
+
+        // CUDA 변환 결과 파일 저장
+        std::ofstream cudaOutFile("cuda_output.yuv", std::ios::binary);
+        if (!cudaOutFile.is_open()) {
+            throw std::runtime_error("Failed to open cuda_output.yuv for writing.");
+        }
+        cudaOutFile.write(reinterpret_cast<const char*>(cudaYUV420p.data), cudaYUV420p.total());
+        cudaOutFile.close();
+        std::cout << "CUDA YUV420p data saved to cuda_output.yuv" << std::endl;
+
+        // ===== G-API 변환 =====
         cv::GMat in;
         cv::GMat out = cv::gapi::BGR2I420(in);
-
         auto pipeline = cv::GComputation(cv::GIn(in), cv::GOut(out));
 
         // G-API 실행
-        cv::Mat yuv420p;
-        pipeline.apply(cv::gin(inputRGB), cv::gout(yuv420p));
+        cv::Mat gapiYUV420p;
+        pipeline.apply(cv::gin(inputRGB), cv::gout(gapiYUV420p));
 
-
-        // 병합된 YUV420p 데이터를 파일로 저장
-        std::ofstream outFile("output.yuv", std::ios::binary);
-        if (!outFile.is_open()) {
-            throw std::runtime_error("Failed to open output file.");
+        // G-API 변환 결과 파일 저장
+        std::ofstream gapiOutFile("gapi_output.yuv", std::ios::binary);
+        if (!gapiOutFile.is_open()) {
+            throw std::runtime_error("Failed to open gapi_output.yuv for writing.");
         }
-        outFile.write(reinterpret_cast<const char*>(yuv420p.data), yuv420p.total());
-        outFile.close();
-        std::cout << "YUV420p data saved to output.yuv" << std::endl;
+        gapiOutFile.write(reinterpret_cast<const char*>(gapiYUV420p.data), gapiYUV420p.total());
+        gapiOutFile.close();
+        std::cout << "G-API YUV420p data saved to gapi_output.yuv" << std::endl;
 
-        // 2. 저장한 output.yuv 파일을 다시 로드
-        std::ifstream inFile("output.yuv", std::ios::binary);
-        if (!inFile.is_open()) {
-            throw std::runtime_error("Failed to open YUV file.");
+        // ===== CUDA와 G-API 결과 비교 =====
+        if (cudaYUV420p.total() != gapiYUV420p.total()) {
+            throw std::runtime_error("CUDA and G-API outputs have different sizes.");
         }
 
-        // YUV420P 데이터를 메모리에 로드
-        std::vector<uint8_t> yuvData(width * height * 3 / 2);
-        inFile.read(reinterpret_cast<char*>(yuvData.data()), yuvData.size());
-        inFile.close();
+        if (memcmp(cudaYUV420p.data, gapiYUV420p.data, cudaYUV420p.total()) == 0) {
+            std::cout << "CUDA and G-API outputs are identical!" << std::endl;
+        } else {
+            std::cout << "CUDA and G-API outputs differ!" << std::endl;
 
-        // YUV 데이터를 OpenCV Mat으로 로드
-        cv::Mat yuv420pMat(height * 3 / 2, width, CV_8UC1, yuvData.data());
+            int numDifferences = 10;
+            // 디버깅용: 차이가 나는 첫 10개 값 출력
+            for (size_t i = 0; i < cudaYUV420p.total(); ++i) {
+                if (cudaYUV420p.data[i] != gapiYUV420p.data[i]) {
+                    std::cout << "Difference at index " << i
+                              << ": CUDA=" << static_cast<int>(cudaYUV420p.data[i])
+                              << ", G-API=" << static_cast<int>(gapiYUV420p.data[i]) << std::endl;
 
-        // YUV420P -> BGR 변환
-        cv::Mat bgrImage;
-        cv::cvtColor(yuv420pMat, bgrImage, cv::COLOR_YUV2BGR_I420);
+                    if (--numDifferences == 0) break; // 최대 10개만 출력
+                }
+            }
+        }
 
-        // 변환된 BGR 이미지 출력
-        cv::imshow("BGR Image from YUV", bgrImage);
+        // ===== YUV420P -> BGR 변환 및 출력 =====
+        // CUDA 결과
+        cv::Mat cudaBGR;
+        cv::cvtColor(cudaYUV420p, cudaBGR, cv::COLOR_YUV2BGR_I420);
+        cv::imshow("CUDA Restored BGR", cudaBGR);
+        cv::imwrite("CUDA_RestoredBGR.png", cudaBGR);
 
-        // 변환된 이미지를 파일로 저장
-        cv::imwrite("RestoredBGR.png", bgrImage);
-        std::cout << "Restored BGR image saved to RestoredBGR.png" << std::endl;
+        // G-API 결과
+        cv::Mat gapiBGR;
+        cv::cvtColor(gapiYUV420p, gapiBGR, cv::COLOR_YUV2BGR_I420);
+        cv::imshow("G-API Restored BGR", gapiBGR);
+        cv::imwrite("GAPI_RestoredBGR.png", gapiBGR);
+
+        std::cout << "Restored BGR images saved to CUDA_RestoredBGR.png and GAPI_RestoredBGR.png" << std::endl;
 
         // 사용자 입력 대기
         cv::waitKey(0);
+
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return EXIT_FAILURE;
@@ -93,6 +108,7 @@ int main() {
 
     return EXIT_SUCCESS;
 }
+
 
 // int main() {
 // //
