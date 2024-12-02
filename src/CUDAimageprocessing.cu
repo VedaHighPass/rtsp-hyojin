@@ -2,6 +2,34 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
+__global__ void rgbToYUV420pKernel(const uchar3* rgb, uint8_t* yPlane, uint8_t* uPlane, uint8_t* vPlane, int width, int height) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x; // 현재 픽셀의 x 좌표
+    int y = blockIdx.y * blockDim.y + threadIdx.y; // 현재 픽셀의 y 좌표
+
+    if (x >= width || y >= height) return;
+
+    // 픽셀 RGB 데이터 읽기
+    uchar3 pixel = rgb[y * width + x];
+    uint8_t r = pixel.x; // BGR에서 R 값
+    uint8_t g = pixel.y; // BGR에서 G 값
+    uint8_t b = pixel.z; // BGR에서 B 값
+
+    // YUV 변환 공식
+    uint8_t yValue = (0.299f * r + 0.587f * g + 0.114f * b);             // Y 채널
+    uint8_t uValue = (-0.14713f * r - 0.28886f * g + 0.436f * b + 128);  // U 채널
+    uint8_t vValue = (0.615f * r - 0.51499f * g - 0.10001f * b + 128);   // V 채널
+
+    // Y 채널 저장
+    yPlane[y * width + x] = yValue;
+
+    // U, V 채널은 2x2 블록당 하나씩 저장
+    if (x % 2 == 0 && y % 2 == 0) {
+        int uvIndex = (y / 2) * (width / 2) + (x / 2);
+        uPlane[uvIndex] = uValue;
+        vPlane[uvIndex] = vValue;
+    }
+}
+
 __global__ void cropAndReorganizeImageKernel(const uint16_t* src, uint16_t* dst, int srcWidth, int dstWidth, int height) {
     int row = blockIdx.y * blockDim.y + threadIdx.y; // 현재 행
     int col = blockIdx.x * blockDim.x + threadIdx.x; // 현재 열
@@ -166,5 +194,40 @@ void applyWhiteBalanceAndGammaCUDA(cv::cuda::GpuMat& gpuImage, float gamma) {
     cudaDeviceSynchronize();
 
     cudaFree(d_mean);
+}
+
+
+void rgbToYUV420pCUDA(const cv::cuda::GpuMat& rgbMat, cv::cuda::GpuMat& yPlane, cv::cuda::GpuMat& uPlane, cv::cuda::GpuMat& vPlane) {
+    int width = rgbMat.cols;
+    int height = rgbMat.rows;
+
+    // 입력 GPU 데이터 (RGB)
+    uchar3* d_rgb;
+    cudaMalloc(&d_rgb, sizeof(uchar3) * width * height);
+    cudaMemcpy(d_rgb, rgbMat.ptr<uchar3>(), sizeof(uchar3) * width * height, cudaMemcpyDeviceToDevice);
+
+    // 출력 GPU 데이터 (Y, U, V 채널)
+    uint8_t* d_yPlane;
+    uint8_t* d_uPlane;
+    uint8_t* d_vPlane;
+    cudaMalloc(&d_yPlane, width * height);             // Y 채널 크기
+    cudaMalloc(&d_uPlane, (width / 2) * (height / 2)); // U 채널 크기
+    cudaMalloc(&d_vPlane, (width / 2) * (height / 2)); // V 채널 크기
+
+    // CUDA 커널 구성
+    dim3 blockDim(16, 16);
+    dim3 gridDim((width + blockDim.x - 1) / blockDim.x, (height + blockDim.y - 1) / blockDim.y);
+
+    // CUDA 커널 실행
+    rgbToYUV420pKernel<<<gridDim, blockDim>>>(d_rgb, d_yPlane, d_uPlane, d_vPlane, width, height);
+    cudaDeviceSynchronize();
+
+    // GPU 데이터를 GpuMat에 래핑
+    yPlane = cv::cuda::GpuMat(height, width, CV_8UC1, d_yPlane);
+    uPlane = cv::cuda::GpuMat(height / 2, width / 2, CV_8UC1, d_uPlane);
+    vPlane = cv::cuda::GpuMat(height / 2, width / 2, CV_8UC1, d_vPlane);
+
+    // 메모리 해제는 필요 시 외부에서 수행
+    cudaFree(d_rgb);
 }
 

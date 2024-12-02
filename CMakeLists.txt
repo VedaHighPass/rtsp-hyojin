@@ -17,6 +17,13 @@ endif()
 find_package(OpenCV REQUIRED)
 find_package(CUDA REQUIRED)
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(AV REQUIRED libavcodec libavformat libavutil libswscale)
+
+include_directories(${AV_INCLUDE_DIRS})
+link_directories(${AV_LIBRARY_DIRS})
+add_definitions(${AV_CFLAGS_OTHER})
+
 # include 디렉토리 설정
 include_directories(
     ${OpenCV_INCLUDE_DIRS}     # OpenCV 헤더 경로
@@ -58,7 +65,8 @@ target_link_libraries(${EXECUTABLE_NAME}
     ${OpenCV_LIBS}             # OpenCV 라이브러리
     ${CUDA_LIBRARIES}          # CUDA 라이브러리
     ${CUDA_CUBLAS_LIBRARIES}   # CUDA BLAS 라이브러리
-    pthread                    # pthread 라이브러리
+    pthread                    # pthread 라이브러리i
+    avcodec avformat avutil swscale
 )
 
 # DNN 및 CUDA 관련 설정

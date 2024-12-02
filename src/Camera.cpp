@@ -6,6 +6,7 @@
 
 #define VIDEODEV "/dev/video0"
 #define WIDTH 3280
+#define WIDTH_CROP 3264
 #define HEIGHT 2464
 
 
@@ -39,6 +40,72 @@ Camera::~Camera() {
 int Camera::get_fd() const {
     return fd;
 }
+
+
+void Camera::initFFmpeg(const char *filename) {
+    const AVCodec *codec = avcodec_find_encoder(AV_CODEC_ID_H264);
+    if (!codec) {
+        throw std::runtime_error("Codec not found");
+    }
+
+    codec_ctx = avcodec_alloc_context3(codec);
+    if (!codec_ctx) {
+        throw std::runtime_error("Could not allocate codec context");
+    }
+
+    codec_ctx->bit_rate = 400000;                  // 비트레이트
+    codec_ctx->width = WIDTH_CROP;                 // 출력 가로 해상도
+    codec_ctx->height = HEIGHT;                    // 출력 세로 해상도
+    codec_ctx->time_base = {1, 25};                // 25fps 설정
+    codec_ctx->gop_size = 10;                      // GOP 크기 (10프레임마다 I-프레임)
+    codec_ctx->max_b_frames = 1;                   // 최대 B-프레임
+    codec_ctx->pix_fmt = AV_PIX_FMT_YUV420P;       // 출력 포맷
+
+    if (avcodec_open2(codec_ctx, codec, NULL) < 0) {
+        throw std::runtime_error("Could not open codec");
+    }
+
+    fmt_ctx = avformat_alloc_context();
+    if (!fmt_ctx) {
+        throw std::runtime_error("Could not allocate format context");
+    }
+
+    AVOutputFormat *output_fmt = av_guess_format(NULL, filename, NULL);
+    fmt_ctx->oformat = output_fmt;
+
+    if (avio_open(&fmt_ctx->pb, filename, AVIO_FLAG_WRITE) < 0) {
+        throw std::runtime_error("Could not open output file");
+    }
+
+    AVStream *stream = avformat_new_stream(fmt_ctx, NULL);
+    stream->time_base = {1, 25};                   // 스트림 시간 기준
+    stream->codecpar->codec_id = AV_CODEC_ID_H264; // H.264 코덱 설정
+    stream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
+    stream->codecpar->width = WIDTH;
+    stream->codecpar->height = HEIGHT;
+    stream->codecpar->format = AV_PIX_FMT_YUV420P;
+
+    int ret = avformat_write_header(fmt_ctx, NULL);
+    if (ret < 0) {
+      char err_buf[AV_ERROR_MAX_STRING_SIZE];
+      av_strerror(ret, err_buf, sizeof(err_buf)); // 에러 메시지 변환
+      throw std::runtime_error(std::string("Error writing header: ") + err_buf);
+    }
+
+    packet = av_packet_alloc();                    // 패킷 메모리 할당
+    frame = av_frame_alloc();                      // 프레임 메모리 할당
+    frame->format = codec_ctx->pix_fmt;
+    frame->width = codec_ctx->width;
+    frame->height = codec_ctx->height;
+
+    if (av_frame_get_buffer(frame, 32) < 0) {
+        throw std::runtime_error("Could not allocate frame buffer");
+    }
+
+    frame_index = 0;                               // 초기 프레임 인덱스 설정
+}
+
+
 
 void Camera::initDevice() {
 
@@ -833,6 +900,25 @@ void Camera::apply_white_balance2(cv::Mat& bayer_image) {
 
 //------------------------------------Using-OpenCV-CUDA-output-start-------------------------------------//
 
+void Camera::encodeFrame(const void *yuvData, size_t size) {
+    int y_size = codec_ctx->width * codec_ctx->height;
+    int uv_size = y_size / 4;
+
+    memcpy(frame->data[0], yuvData, y_size);              // Y 채널
+    memcpy(frame->data[1], (uint8_t*)yuvData + y_size, uv_size);  // U 채널
+    memcpy(frame->data[2], (uint8_t*)yuvData + y_size + uv_size, uv_size);  // V 채널
+
+    frame->pts = frame_index++;                           // 프레임 PTS 설정
+
+    if (avcodec_send_frame(codec_ctx, frame) < 0) {
+        throw std::runtime_error("Error sending frame for encoding");
+    }
+
+    while (avcodec_receive_packet(codec_ctx, packet) == 0) {
+        av_interleaved_write_frame(fmt_ctx, packet);      // 패킷을 파일에 기록
+        av_packet_unref(packet);
+    }
+}
 
 // 감마 보정 함수
 void Camera::applyGammaCorrection(cv::Mat& image, double gamma) {
@@ -887,7 +973,7 @@ void Camera::processRawImageCUDA(void* data, int width, int height) {
     int srcHeight = height;
 
     // 출력 데이터 크기 (3264x2464)
-    int dstWidth = 3264;
+    int dstWidth = WIDTH_CROP;
     int dstHeight = srcHeight;
 
     // GPU 메모리 할당
@@ -940,10 +1026,32 @@ void Camera::processRawImageCUDA(void* data, int width, int height) {
     //applyWhiteBalanceAndGammaCUDA(gpuRGB, rGain, gGain, bGain, gamma);
     applyWhiteBalanceAndGammaCUDA(gpuRGB, gamma);
 
+
+    cv::cuda::GpuMat gpuY, gpuU, gpuV;
+
+    // gpuRGB를 YUV420p로 변환
+    rgbToYUV420pCUDA(gpuRGB, gpuY, gpuU, gpuV);
+
+    // YUV420p 데이터를 CPU로 다운로드
+    cv::Mat yCPU, uCPU, vCPU;
+    gpuY.download(yCPU);
+    gpuU.download(uCPU);
+    gpuV.download(vCPU);
+
+    // YUV420p 데이터를 하나의 연속된 Mat로 병합 (FFmpeg로 전달 가능)
+    cv::Mat yuv420pCPU(yCPU.rows * 3 / 2, yCPU.cols, CV_8UC1);
+    memcpy(yuv420pCPU.data, yCPU.data, gpuY.cols * gpuY.rows);
+    memcpy(yuv420pCPU.data + gpuY.cols * gpuY.rows, uCPU.data, gpuU.cols * gpuU.rows);
+    memcpy(yuv420pCPU.data + gpuY.cols * gpuY.rows + gpuU.cols * gpuU.rows, vCPU.data, gpuV.cols * gpuV.rows);
+
+
+       // FFmpeg로 인코딩
+    encodeFrame(yuv420pCPU.data, yuv420pCPU.total());
+
     // GPU에서 CPU로 다운로드 및 시각화
-    cv::Mat finalImage;
-    gpuRGB.download(finalImage); // GPU → CPU
-    cv::imshow("Processed Image", finalImage);
+//     cv::Mat finalImage;
+//     gpuRGB.download(finalImage); // GPU → CPU
+//     cv::imshow("Processed Image", finalImage);
     //cv::imwrite("WhiteBalanceAndGamma.png", finalImage);
 
     // Step 7: 키 입력으로 종료

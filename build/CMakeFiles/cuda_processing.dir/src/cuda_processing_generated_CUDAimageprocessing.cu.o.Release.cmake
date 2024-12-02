@@ -58,18 +58,18 @@ endif()
 
 # Set these up as variables to make reading the generated file easier
 set(CMAKE_COMMAND "/usr/bin/cmake") # path
-set(source_file "/mnt/ssd/projects/HighPass/test/test_orin_v4l2_fb/src/CUDAimageprocessing.cu") # path
-set(NVCC_generated_dependency_file "/mnt/ssd/projects/HighPass/test/test_orin_v4l2_fb/build/CMakeFiles/cuda_processing.dir/src/cuda_processing_generated_CUDAimageprocessing.cu.o.NVCC-depend") # path
-set(cmake_dependency_file "/mnt/ssd/projects/HighPass/test/test_orin_v4l2_fb/build/CMakeFiles/cuda_processing.dir/src/cuda_processing_generated_CUDAimageprocessing.cu.o.depend") # path
+set(source_file "/mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/CUDAimageprocessing.cu") # path
+set(NVCC_generated_dependency_file "/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles/cuda_processing.dir/src/cuda_processing_generated_CUDAimageprocessing.cu.o.NVCC-depend") # path
+set(cmake_dependency_file "/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles/cuda_processing.dir/src/cuda_processing_generated_CUDAimageprocessing.cu.o.depend") # path
 set(CUDA_make2cmake "/usr/share/cmake-3.22/Modules/FindCUDA/make2cmake.cmake") # path
 set(CUDA_parse_cubin "/usr/share/cmake-3.22/Modules/FindCUDA/parse_cubin.cmake") # path
 set(build_cubin OFF) # bool
 set(CUDA_HOST_COMPILER "/usr/bin/cc") # path
 # We won't actually use these variables for now, but we need to set this, in
 # order to force this file to be run again if it changes.
-set(generated_file_path "/mnt/ssd/projects/HighPass/test/test_orin_v4l2_fb/build/CMakeFiles/cuda_processing.dir/src/.") # path
-set(generated_file_internal "/mnt/ssd/projects/HighPass/test/test_orin_v4l2_fb/build/CMakeFiles/cuda_processing.dir/src/./cuda_processing_generated_CUDAimageprocessing.cu.o") # path
-set(generated_cubin_file_internal "/mnt/ssd/projects/HighPass/test/test_orin_v4l2_fb/build/CMakeFiles/cuda_processing.dir/src/./cuda_processing_generated_CUDAimageprocessing.cu.o.cubin.txt") # path
+set(generated_file_path "/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles/cuda_processing.dir/src/.") # path
+set(generated_file_internal "/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles/cuda_processing.dir/src/./cuda_processing_generated_CUDAimageprocessing.cu.o") # path
+set(generated_cubin_file_internal "/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles/cuda_processing.dir/src/./cuda_processing_generated_CUDAimageprocessing.cu.o.cubin.txt") # path
 
 set(CUDA_NVCC_EXECUTABLE "/usr/local/cuda-12.6/bin/nvcc") # path
 set(CUDA_NVCC_FLAGS -O3;-gencode;arch=compute_87,code=sm_87 ;; ) # list
@@ -79,7 +79,7 @@ set(CUDA_NVCC_FLAGS_DEBUG  ; )
 set(CUDA_NVCC_FLAGS_MINSIZEREL  ; )
 set(CUDA_NVCC_FLAGS_RELWITHDEBINFO  ; )
 set(nvcc_flags -m64) # list
-set(CUDA_NVCC_INCLUDE_DIRS [==[/usr/local/cuda-12.6/include;/usr/local/include/opencv4;/usr/local/cuda-12.6/include;/mnt/ssd/projects/HighPass/test/test_orin_v4l2_fb/inc]==]) # list (needs to be in lua quotes to address backslashes)
+set(CUDA_NVCC_INCLUDE_DIRS [==[/usr/local/cuda-12.6/include;/usr/include/aarch64-linux-gnu;/usr/local/include/opencv4;/usr/local/cuda-12.6/include;/mnt/ssd/projects/HighPass/test/test_orin_rtsp/inc]==]) # list (needs to be in lua quotes to address backslashes)
 string(REPLACE "\\" "/" CUDA_NVCC_INCLUDE_DIRS "${CUDA_NVCC_INCLUDE_DIRS}")
 set(CUDA_NVCC_COMPILE_DEFINITIONS [==[]==]) # list (needs to be in lua quotes see #16510 ).
 set(format_flag "-c") # string

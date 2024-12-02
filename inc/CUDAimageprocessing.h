@@ -46,5 +46,8 @@ void applyWhiteBalanceAndGammaCUDA(cv::cuda::GpuMat& gpuImage, float gamma);
  */
 void cropAndReorganizeImageCUDA(const uint16_t* src, uint16_t* dst, int srcWidth, int dstWidth, int height);
 
+
+void rgbToYUV420pCUDA(const cv::cuda::GpuMat& rgbMat, cv::cuda::GpuMat& yPlane, cv::cuda::GpuMat& uPlane, cv::cuda::GpuMat& vPlane);
+
 #endif // CUDA_IMAGE_PROCESSING_H
 

@@ -34,5 +34,18 @@
 #include <opencv2/cudafilters.hpp>  // CUDA 기반 필터 함수(cv::cuda::createGaussianFilter 등) 제공
 #include <opencv2/cudacodec.hpp>    // CUDA 기반 비디오 디코딩/인코딩(cv::cudacodec::VideoReader 등) 제공
 #include <opencv2/cudawarping.hpp>  // CUDA 기반 이미지 왜곡 처리 함수(cv::cuda::resize 등) 제공
+#include <opencv2/gapi/imgproc.hpp>
+#include <opencv2/gapi.hpp>
+
+#include <opencv2/cudacodec.hpp>
+
+extern "C" {
+    #include <libavcodec/avcodec.h>
+    #include <libavformat/avformat.h>
+    #include <libswscale/swscale.h>
+    #include <libavutil/imgutils.h>
+    #include <libavutil/opt.h>
+    #include <libavutil/time.h>
+}
 
 #endif  // 헤더 파일 중복 포함 방지를 위한 매크로 정의 끝

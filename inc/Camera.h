@@ -14,9 +14,16 @@ public:
     Camera();
     ~Camera();
 
+    void initFFmpeg(const char *filename);
     int get_fd() const;
     bool captureFrameBuffer(FrameBuffer& framebuffer);
     bool captureOpencv(Camera& camera);
+
+    AVCodecContext *codec_ctx;      // FFmpeg 코덱 컨텍스트
+    AVFormatContext *fmt_ctx;       // FFmpeg 포맷 컨텍스트
+    AVPacket *packet;               // FFmpeg 패킷 (인코딩된 데이터 저장)
+    AVFrame *frame;                 // FFmpeg 프레임 (YUV420p 데이터 저장)
+    int frame_index;                // 현재 프레임 인덱스
 
 
 private:
@@ -30,6 +37,8 @@ private:
     struct Buffer *buffers = NULL;
     volatile unsigned int n_buffers = 0;      /* 버퍼 개수 */
 
+
+    // V4l2 Camera setup
     void initDevice();
     void initMMap();
     void startCapturing();
@@ -62,6 +71,10 @@ private:
     void saveHistogramImage(uint8_t* data, int width, int height, const std::string& histogramImageFilename, const std::string& histogramCsvFilename);
     cv::Scalar computeSSIM(const cv::Mat& img1, const cv::Mat& img2);
 
+
+
+    // FFmpeg
+    void encodeFrame(const void *yuvData, size_t size);
 
 
 };
