@@ -1012,9 +1012,9 @@ void Camera::processRawImageCUDA(void* data, int width, int height) {
 //     std::cout << "gpu8bitRaw number of channels(c1,c3): " << gpu8bitRaw.channels() << std::endl;
 
     // CUDA를 사용한 디모자이킹 (Debayering)
-    cv::cuda::GpuMat gpuRGB;
+    cv::cuda::GpuMat gpuBGR;
     //cv::cuda::demosaicing(gpu8bitRaw, gpuRGB, cv::COLOR_BayerRG2BGR); //Demosaicing using bilinear interpolation
-    cv::cuda::demosaicing(gpu8bitRaw, gpuRGB, cv::cuda::COLOR_BayerRG2BGR_MHT); //Demosaicing using Malvar-He-Cutler algorithm
+    cv::cuda::demosaicing(gpu8bitRaw, gpuBGR, cv::cuda::COLOR_BayerRG2BGR_MHT); //Demosaicing using Malvar-He-Cutler algorithm
 
 //     std::cout << "gpuRGB image size: " << gpuRGB.cols << "x" << gpuRGB.rows << std::endl;
 //     std::cout << "gpuRGB type 0(cv_8u), 1(cv_8s), 2(cv_16u): " << gpuRGB.depth() << std::endl;
@@ -1024,38 +1024,66 @@ void Camera::processRawImageCUDA(void* data, int width, int height) {
     float gamma = 0.6f;
     //float rGain = 3.0f, gGain = 0.6f, bGain = 1.1f; // 임의 설정, 필요시 동적으로 조정 가능
     //applyWhiteBalanceAndGammaCUDA(gpuRGB, rGain, gGain, bGain, gamma);
-    applyWhiteBalanceAndGammaCUDA(gpuRGB, gamma);
+    applyWhiteBalanceAndGammaCUDA(gpuBGR, gamma);
+
+    std::cout << "[DEBUG] gpuBGR image: " << gpuBGR.cols << "x" << gpuBGR.rows << std::endl;
+    std::cout << "[DEBUG] gpuBGR step: " << gpuBGR.step << std::endl;
+    std::cout << "[DEBUG] gpuBGR type 0(cv_8u), 1(cv_8s), 2(cv_16u): " << gpuBGR.depth() << std::endl;
+    std::cout << "[DEBUG] gpuBGR number of channels(c1,c3): " << gpuBGR.channels() << std::endl << std::endl;
 
 
-    cv::cuda::GpuMat gpuY, gpuU, gpuV;
+    // CUDA YUV420p 변환 수행
+    cv::cuda::GpuMat gpuYUV420p;
+    BGRtoYUV420P(gpuBGR, gpuYUV420p);
 
-    // gpuRGB를 YUV420p로 변환
-    rgbToYUV420pCUDA(gpuRGB, gpuY, gpuU, gpuV);
-
-    // YUV420p 데이터를 CPU로 다운로드
-    cv::Mat yCPU, uCPU, vCPU;
-    gpuY.download(yCPU);
-    gpuU.download(uCPU);
-    gpuV.download(vCPU);
-
-    // YUV420p 데이터를 하나의 연속된 Mat로 병합 (FFmpeg로 전달 가능)
-    cv::Mat yuv420pCPU(yCPU.rows * 3 / 2, yCPU.cols, CV_8UC1);
-    memcpy(yuv420pCPU.data, yCPU.data, gpuY.cols * gpuY.rows);
-    memcpy(yuv420pCPU.data + gpuY.cols * gpuY.rows, uCPU.data, gpuU.cols * gpuU.rows);
-    memcpy(yuv420pCPU.data + gpuY.cols * gpuY.rows + gpuU.cols * gpuU.rows, vCPU.data, gpuV.cols * gpuV.rows);
+    std::cout << "[DEBUG] gpuYUV420p image: " << gpuYUV420p.cols << "x" << gpuYUV420p.rows << std::endl;
+    std::cout << "[DEBUG] gpuYUV420p step: " << gpuYUV420p.step << std::endl;
+    std::cout << "[DEBUG] gpuyuv420p type 0(cv_8u), 1(cv_8s), 2(cv_16u): " << gpuYUV420p.depth() << std::endl;
+    std::cout << "[DEBUG] gpuyuv420p number of channels(c1,c3): " << gpuYUV420p.channels() << std::endl<< std::endl;
 
 
-       // FFmpeg로 인코딩
-    encodeFrame(yuv420pCPU.data, yuv420pCPU.total());
+    // GPU -> CPU
+    cv::Mat cpuYUV420p;
+    gpuYUV420p.download(cpuYUV420p);
+    std::cout << "[DEBUG] cpuYUV420p image: " << cpuYUV420p.cols << "x" << cpuYUV420p.rows << std::endl;
+    std::cout << "[DEBUG] cpuYUV420p step: " << cpuYUV420p.step << std::endl;
+    std::cout << "[DEBUG] cpuYUV420p type 0(cv_8u), 1(cv_8s), 2(cv_16u): " << cpuYUV420p.depth() << std::endl;
+    std::cout << "[DEBUG] cpuYUV420p number of channels(c1,c3): " << cpuYUV420p.channels() << std::endl<< std::endl;
+
+    // cuda_outpu.yuv 저장
+    std::ofstream cudaOutFile("cuda_output.yuv", std::ios::binary);
+    if (!cudaOutFile.is_open()) {
+        throw std::runtime_error("Failed to open cuda_output.yuv for writing.");
+    }
+    cudaOutFile.write(reinterpret_cast<const char*>(cpuYUV420p.data), cpuYUV420p.total() * cpuYUV420p.elemSize());
+
+    cudaOutFile.close();
+    std::cout << "CPU YUV420p data saved to cuda_output.yuv" << std::endl;
+
+    // YUV420P에서 BGR로 변환 수행
+    cv::Mat restoredBgrImage;
+    cv::cvtColor(cpuYUV420p, restoredBgrImage, cv::COLOR_YUV2BGR_I420);
+    std::cout << "[DEBUG] restoredBgrImage image: " << restoredBgrImage.cols << "x" << restoredBgrImage.rows << std::endl;
+    std::cout << "[DEBUG] restoredBgrImage step: " << restoredBgrImage.step << std::endl;
+    std::cout << "[DEBUG} restoredBgrImage type 0(cv_8u), 1(cv_8s), 2(cv_16u): " << restoredBgrImage.depth() << std::endl;
+    std::cout << "[DEBUG] restoredBgrImage number of channels(c1,c3): " << restoredBgrImage.channels() << std::endl<< std::endl;
 
     // GPU에서 CPU로 다운로드 및 시각화
-//     cv::Mat finalImage;
-//     gpuRGB.download(finalImage); // GPU → CPU
-//     cv::imshow("Processed Image", finalImage);
-    //cv::imwrite("WhiteBalanceAndGamma.png", finalImage);
+    cv::imshow("Processed Image", restoredBgrImage);
+    cv::imwrite("Processd.png", restoredBgrImage);
 
+
+    // FFmpeg로 인코딩
+    //encodeFrame(yuv420pCPU.data, yuv420pCPU.total());
+
+//     // GPU에서 CPU로 다운로드 및 시각화
+//     cv::Mat finalImage;
+//     restoredBgrImage.download(finalImage); // GPU → CPU
+//     cv::imshow("Processed Image", finalImage);
+//     cv::imwrite("Processd.png", finalImage);
+//
     // Step 7: 키 입력으로 종료
-    if (cv::waitKey(1) == 'q') {
+    if (cv::waitKey(0) == 'q') {
         throw std::runtime_error("Quit");
     }
 

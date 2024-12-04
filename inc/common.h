@@ -1,6 +1,8 @@
 #ifndef __COMMON_H__  // 헤더 파일 중복 포함을 방지하기 위한 매크로 정의 시작
 #define __COMMON_H__
 
+#include <cstdint>  // uint64_t 사용을 위한 헤더 추가
+#include <cstdio>   // printf 사용을 위한 헤더 추가
 
 #include <iostream>                 // 입출력 스트림을 제공
 #include <fstream>                  // 파일 입출력 스트림을 제공
@@ -27,7 +29,6 @@
 #include <linux/videodev2.h>        // V4L2(Video4Linux2) 장치 제어 구조체 및 상수 정의
 
 #include <opencv2/opencv.hpp>       // OpenCV의 주요 기능(cv::Mat, imshow 등) 제공
-
 #include <opencv2/cudaimgproc.hpp>  // CUDA 기반 이미지 처리 함수(cv::cuda::cvtColor 등) 제공
 #include <opencv2/cudaarithm.hpp>   // CUDA 기반 수학적 연산 함수(cv::cuda::add 등) 제공
 #include <opencv2/core/cuda.hpp>    // CUDA 장치 관리 및 정보 함수(cv::cuda::GpuMat 등) 제공
@@ -36,8 +37,10 @@
 #include <opencv2/cudawarping.hpp>  // CUDA 기반 이미지 왜곡 처리 함수(cv::cuda::resize 등) 제공
 #include <opencv2/gapi/imgproc.hpp>
 #include <opencv2/gapi.hpp>
-
 #include <opencv2/cudacodec.hpp>
+
+#include <device_launch_parameters.h>
+#include <cuda_runtime.h>
 
 extern "C" {
     #include <libavcodec/avcodec.h>

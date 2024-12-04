@@ -1,10 +1,7 @@
 #ifndef CUDA_IMAGE_PROCESSING_H
 #define CUDA_IMAGE_PROCESSING_H
 
-#include <opencv2/core/cuda.hpp>
-#include <cuda_runtime.h> // CUDA 런타임 API 함수 선언
-#include <cuda.h>         // CUDA 드라이버 API 함수 선언
-
+#include "common.h"
 /**
  * @file CUDAImageProcessing.h
  * @brief Header file for CUDA-based image processing functions, including white balance, gamma correction, and image cropping.
@@ -47,7 +44,6 @@ void applyWhiteBalanceAndGammaCUDA(cv::cuda::GpuMat& gpuImage, float gamma);
 void cropAndReorganizeImageCUDA(const uint16_t* src, uint16_t* dst, int srcWidth, int dstWidth, int height);
 
 
-void rgbToYUV420pCUDA(const cv::cuda::GpuMat& rgbMat, cv::cuda::GpuMat& yPlane, cv::cuda::GpuMat& uPlane, cv::cuda::GpuMat& vPlane);
-
+void BGRtoYUV420P(const cv::cuda::GpuMat& bgrImage, cv::cuda::GpuMat& yuvImage);
 #endif // CUDA_IMAGE_PROCESSING_H
 
