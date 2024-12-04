@@ -900,36 +900,6 @@ void Camera::apply_white_balance2(cv::Mat& bayer_image) {
 
 //------------------------------------Using-OpenCV-CUDA-output-start-------------------------------------//
 
-void Camera::encodeFrame(const void *yuvData, size_t size) {
-    int y_size = codec_ctx->width * codec_ctx->height;
-    int uv_size = y_size / 4;
-
-    memcpy(frame->data[0], yuvData, y_size);              // Y 채널
-    memcpy(frame->data[1], (uint8_t*)yuvData + y_size, uv_size);  // U 채널
-    memcpy(frame->data[2], (uint8_t*)yuvData + y_size + uv_size, uv_size);  // V 채널
-
-    frame->pts = frame_index++;                           // 프레임 PTS 설정
-
-    if (avcodec_send_frame(codec_ctx, frame) < 0) {
-        throw std::runtime_error("Error sending frame for encoding");
-    }
-
-    while (avcodec_receive_packet(codec_ctx, packet) == 0) {
-        av_interleaved_write_frame(fmt_ctx, packet);      // 패킷을 파일에 기록
-        av_packet_unref(packet);
-    }
-}
-
-// 감마 보정 함수
-void Camera::applyGammaCorrection(cv::Mat& image, double gamma) {
-    cv::Mat lookUpTable(1, 256, CV_8U);
-    uchar* ptr = lookUpTable.ptr();
-    for (int i = 0; i < 256; ++i) {
-        ptr[i] = cv::saturate_cast<uchar>(pow(i / 255.0, gamma) * 255.0);
-    }
-
-    cv::LUT(image, lookUpTable, image); // 감마 보정 적용
-}
 
 
 // 화이트 밸런스 함수

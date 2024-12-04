@@ -1,6 +1,57 @@
 #include "CUDAimageprocessing.h"
 
 
+//----------------------------------------------------- CUDA 커널 정의 시작  ------------------------------------------------
+__global__ void BGRtoYUV420PKernel(const uchar* bgr, uchar* yuv, uint64_t width,
+    uint64_t height, uint64_t bgr_step, int64_t yuv_step)
+{
+    uint64_t x = blockIdx.x * blockDim.x + threadIdx.x;
+    uint64_t y = blockIdx.y * blockDim.y + threadIdx.y;
+
+//     if (x == 0 && y == 0) { // 한 번만 출력하기 위해 조건 추가
+//         printf("Size of int: %u\n", (unsigned int)sizeof(int));
+//         printf("Size of uint64_t: %llu\n", (unsigned long long)sizeof(uint64_t));
+//         printf("Size of size_t: %llu\n", (unsigned long long)sizeof(size_t));
+//         printf("Size of uchar: %u\n", (unsigned int)sizeof(uchar));
+//         printf("Size of float: %u\n", (unsigned int)sizeof(float));
+//     }
+
+
+    if (x < width && y < height)
+    {
+        uint64_t idx = y*bgr_step + (3 * x);
+        uchar B = bgr[idx];
+        uchar G = bgr[idx + 1];
+        uchar R = bgr[idx + 2];
+
+        // YUV 변환 공식
+        float Y = 0.257f * R + 0.504f * G + 0.098f * B + 16;
+        float U = -0.148f * R - 0.291f * G + 0.499f * B + 128;
+        float V = 0.439f * R - 0.368f * G - 0.071f * B + 128;
+
+        uint64_t y_idx = y * yuv_step + x;
+        yuv[y_idx] = static_cast<uchar>(Y);  // Y 채널 저장
+
+        // U, V 채널은 2x2 블록마다 하나의 값을 가짐 (서브샘플링)
+        if ((x % 2 == 0) && (y % 2 == 0) && (x < width) && (y < height))
+        {
+            uint64_t uv_x = x / 2;
+            uint64_t uv_y = y / 2;
+
+            // U와 V 채널의 시작 위치 계산
+            uint64_t u_offset = yuv_step * height;              // U 채널의 시작 위치 (Y 채널 뒤)
+            uint64_t v_offset = u_offset + (yuv_step / 2) * (height / 2);  // V 채널의 시작 위치 (U 채널 뒤)
+
+            // 패딩을 고려한 U와 V 인덱스 계산 및 값 저장
+            uint64_t uv_idx = (uv_y/2)*yuv_step + (uv_y%2)*(width/2)  + uv_x;
+
+            // U와 V 값 저장
+            yuv[u_offset + uv_idx] = static_cast<uchar>(U);  // U 채널 저장
+            yuv[v_offset + uv_idx] = static_cast<uchar>(V);  // V 채널 저장
+        }
+    }
+}
+
 __global__ void cropAndReorganizeImageKernel(const uint16_t* src, uint16_t* dst, int srcWidth, int dstWidth, int height) {
     int row = blockIdx.y * blockDim.y + threadIdx.y; // 현재 행
     int col = blockIdx.x * blockDim.x + threadIdx.x; // 현재 열
@@ -108,6 +159,7 @@ __global__ void whiteBalanceAndGammaKernel(uchar3* image, int width, int height,
     image[idx] = pixel;
 }
 
+//----------------------------------------------------- CUDA 커널 정의 끝  ------------------------------------------------
 
 
 
@@ -115,112 +167,15 @@ __global__ void whiteBalanceAndGammaKernel(uchar3* image, int width, int height,
 
 
 
-//---------------------------------------------------------------------------------------------------//
 
 
 
 
-// CUDA 기반 크롭 및 재구성 함수
-void cropAndReorganizeImageCUDA(const uint16_t* src, uint16_t* dst, int srcWidth, int dstWidth, int height) {
-    dim3 block(256); // 스레드 블록 크기
-    dim3 grid((dstWidth + block.x - 1) / block.x, height); // 각 행을 처리하는 그리드 크기
-
-    // CUDA 커널 호출
-    cropAndReorganizeImageKernel<<<grid, block>>>(src, dst, srcWidth, dstWidth, height);
-    cudaDeviceSynchronize();
-}
 
 
 
-// CUDA 기반 화이트 밸런스 및 감마 보정 적용 함수
-void applyWhiteBalanceAndGammaCUDA(cv::cuda::GpuMat& gpuImage, float gamma) {
-    dim3 block(16, 16);
-    dim3 grid((gpuImage.cols + block.x - 1) / block.x, (gpuImage.rows + block.y - 1) / block.y);
 
-    uchar3* d_image = (uchar3*)gpuImage.data;
-
-    // 채널별 평균값 계산
-    float* d_mean;
-    cudaMalloc(&d_mean, 3 * sizeof(float));
-    cudaMemset(d_mean, 0, 3 * sizeof(float));
-
-    computeChannelMean<<<grid, block>>>(d_image, gpuImage.cols, gpuImage.rows, d_mean);
-    cudaDeviceSynchronize();
-
-    float h_mean[3];
-    cudaMemcpy(h_mean, d_mean, 3 * sizeof(float), cudaMemcpyDeviceToHost);
-
-    float rMean = h_mean[0] / (gpuImage.cols * gpuImage.rows);
-    float gMean = h_mean[1] / (gpuImage.cols * gpuImage.rows);
-    float bMean = h_mean[2] / (gpuImage.cols * gpuImage.rows);
-
-    // 보정 계수 계산
-    float k = (rMean + gMean + bMean) / 3.0f;
-    float rGain = k / rMean;
-    float gGain = k / gMean;
-    float bGain = k / bMean;
-
-    // 화이트 밸런스 및 감마 보정 커널 호출
-    whiteBalanceAndGammaKernel<<<grid, block>>>(d_image, gpuImage.cols, gpuImage.rows, rGain, gGain, bGain, gamma);
-    cudaDeviceSynchronize();
-
-    cudaFree(d_mean);
-}
-
-
-// CUDA 커널 정의
-__global__ void BGRtoYUV420PKernel(const uchar* bgr, uchar* yuv, uint64_t width,
-    uint64_t height, uint64_t bgr_step, int64_t yuv_step)
-{
-    uint64_t x = blockIdx.x * blockDim.x + threadIdx.x;
-    uint64_t y = blockIdx.y * blockDim.y + threadIdx.y;
-
-//     if (x == 0 && y == 0) { // 한 번만 출력하기 위해 조건 추가
-//         printf("Size of int: %u\n", (unsigned int)sizeof(int));
-//         printf("Size of uint64_t: %llu\n", (unsigned long long)sizeof(uint64_t));
-//         printf("Size of size_t: %llu\n", (unsigned long long)sizeof(size_t));
-//         printf("Size of uchar: %u\n", (unsigned int)sizeof(uchar));
-//         printf("Size of float: %u\n", (unsigned int)sizeof(float));
-//     }
-
-
-    if (x < width && y < height)
-    {
-        uint64_t idx = y*bgr_step + (3 * x);
-        uchar B = bgr[idx];
-        uchar G = bgr[idx + 1];
-        uchar R = bgr[idx + 2];
-
-        // YUV 변환 공식
-        float Y = 0.257f * R + 0.504f * G + 0.098f * B + 16;
-        float U = -0.148f * R - 0.291f * G + 0.499f * B + 128;
-        float V = 0.439f * R - 0.368f * G - 0.071f * B + 128;
-
-        uint64_t y_idx = y * yuv_step + x;
-        yuv[y_idx] = static_cast<uchar>(Y);  // Y 채널 저장
-
-        // U, V 채널은 2x2 블록마다 하나의 값을 가짐 (서브샘플링)
-        if ((x % 2 == 0) && (y % 2 == 0) && (x < width) && (y < height))
-        {
-            uint64_t uv_x = x / 2;
-            uint64_t uv_y = y / 2;
-
-            // U와 V 채널의 시작 위치 계산
-            uint64_t u_offset = yuv_step * height;              // U 채널의 시작 위치 (Y 채널 뒤)
-            uint64_t v_offset = u_offset + (yuv_step / 2) * (height / 2);  // V 채널의 시작 위치 (U 채널 뒤)
-
-            // 패딩을 고려한 U와 V 인덱스 계산 및 값 저장
-            uint64_t uv_idx = (uv_y/2)*yuv_step + (uv_y%2)*(width/2)  + uv_x;
-
-            // U와 V 값 저장
-            yuv[u_offset + uv_idx] = static_cast<uchar>(U);  // U 채널 저장
-            yuv[v_offset + uv_idx] = static_cast<uchar>(V);  // V 채널 저장
-        }
-    }
-}
-
-
-
+//----------------------------------------------------- CUDA 커널 Call 함수  정의 시작  -----------------------------------
 
 
 void BGRtoYUV420P(const cv::cuda::GpuMat& bgrImage, cv::cuda::GpuMat& yuvImage)
@@ -287,3 +242,57 @@ void BGRtoYUV420P(const cv::cuda::GpuMat& bgrImage, cv::cuda::GpuMat& yuvImage)
 
 
 }
+
+
+
+
+// CUDA 기반 크롭 및 재구성 함수
+void cropAndReorganizeImageCUDA(const uint16_t* src, uint16_t* dst, int srcWidth, int dstWidth, int height) {
+    dim3 block(256); // 스레드 블록 크기
+    dim3 grid((dstWidth + block.x - 1) / block.x, height); // 각 행을 처리하는 그리드 크기
+
+    // CUDA 커널 호출
+    cropAndReorganizeImageKernel<<<grid, block>>>(src, dst, srcWidth, dstWidth, height);
+    cudaDeviceSynchronize();
+}
+
+
+
+// CUDA 기반 화이트 밸런스 및 감마 보정 적용 함수
+void applyWhiteBalanceAndGammaCUDA(cv::cuda::GpuMat& gpuImage, float gamma) {
+    dim3 block(16, 16);
+    dim3 grid((gpuImage.cols + block.x - 1) / block.x, (gpuImage.rows + block.y - 1) / block.y);
+
+    uchar3* d_image = (uchar3*)gpuImage.data;
+
+    // 채널별 평균값 계산
+    float* d_mean;
+    cudaMalloc(&d_mean, 3 * sizeof(float));
+    cudaMemset(d_mean, 0, 3 * sizeof(float));
+
+    computeChannelMean<<<grid, block>>>(d_image, gpuImage.cols, gpuImage.rows, d_mean);
+    cudaDeviceSynchronize();
+
+    float h_mean[3];
+    cudaMemcpy(h_mean, d_mean, 3 * sizeof(float), cudaMemcpyDeviceToHost);
+
+    float rMean = h_mean[0] / (gpuImage.cols * gpuImage.rows);
+    float gMean = h_mean[1] / (gpuImage.cols * gpuImage.rows);
+    float bMean = h_mean[2] / (gpuImage.cols * gpuImage.rows);
+
+    // 보정 계수 계산
+    float k = (rMean + gMean + bMean) / 3.0f;
+    float rGain = k / rMean;
+    float gGain = k / gMean;
+    float bGain = k / bMean;
+
+    // 화이트 밸런스 및 감마 보정 커널 호출
+    whiteBalanceAndGammaKernel<<<grid, block>>>(d_image, gpuImage.cols, gpuImage.rows, rGain, gGain, bGain, gamma);
+    cudaDeviceSynchronize();
+
+    cudaFree(d_mean);
+}
+
+
+
+//----------------------------------------------------- CUDA 커널 Call 함수 정의 끝  -----------------------------------
