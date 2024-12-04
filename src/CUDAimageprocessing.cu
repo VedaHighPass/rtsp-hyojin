@@ -199,8 +199,8 @@ void BGRtoYUV420P(const cv::cuda::GpuMat& bgrImage, cv::cuda::GpuMat& yuvImage)
 
     // 이미지 리사이즈 (해상도가 너무 클 경우 줄이기)
     cv::cuda::GpuMat resizedBgrImage;
-    if (width > 1920 || height > 1080) {  // 해상도가 Full HD 이상인 경우
-        cv::cuda::resize(bgrImage, resizedBgrImage, cv::Size(1920, 1080));
+    if (width > WIDTH_RESIZE || height > HEIGHT_RESIZE) {  // 해상도가 Full HD 이상인 경우
+        cv::cuda::resize(bgrImage, resizedBgrImage, cv::Size(WIDTH_RESIZE, HEIGHT_RESIZE));
         //printf("[DEBUG] 리사이즈된 이미지 크기: %d x %d\n", resizedBgrImage.cols, resizedBgrImage.rows);
         width = resizedBgrImage.cols;
         height = resizedBgrImage.rows;

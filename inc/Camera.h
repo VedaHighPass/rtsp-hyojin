@@ -19,12 +19,6 @@ public:
     bool captureFrameBuffer(FrameBuffer& framebuffer);
     bool captureOpencv(Camera& camera);
 
-    AVCodecContext *codec_ctx;      // FFmpeg 코덱 컨텍스트
-    AVFormatContext *fmt_ctx;       // FFmpeg 포맷 컨텍스트
-    AVPacket *packet;               // FFmpeg 패킷 (인코딩된 데이터 저장)
-    AVFrame *frame;                 // FFmpeg 프레임 (YUV420p 데이터 저장)
-    int frame_index;                // 현재 프레임 인덱스
-
 
 private:
     struct Buffer {
@@ -32,10 +26,17 @@ private:
         size_t length;
     };
 
-    int fd;
+    int fd, i = 0;
     int frameCounter = 0, image_count = 1;
     struct Buffer *buffers = NULL;
     volatile unsigned int n_buffers = 0;      /* 버퍼 개수 */
+
+    AVCodecContext *codec_ctx;      // FFmpeg 코덱 컨텍스트
+    AVFormatContext *fmt_ctx;       // FFmpeg 포맷 컨텍스트
+    AVPacket *packet;               // FFmpeg 패킷 (인코딩된 데이터 저장)
+    AVFrame *frame;                 // FFmpeg 프레임 (YUV420p 데이터 저장)
+    int frame_index;                // 현재 프레임 인덱스
+
 
 
     // V4l2 Camera setup
@@ -74,7 +75,7 @@ private:
 
 
     // FFmpeg
-    void encodeFrame(const void *yuvData, size_t size);
+    void encodeFrame(const cv::Mat& cpuYUV420p, size_t size);
 
 
 };

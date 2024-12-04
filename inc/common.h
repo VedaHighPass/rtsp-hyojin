@@ -1,6 +1,14 @@
 #ifndef __COMMON_H__  // 헤더 파일 중복 포함을 방지하기 위한 매크로 정의 시작
 #define __COMMON_H__
 
+#define VIDEODEV "/dev/video0"
+#define WIDTH 3280
+#define WIDTH_CROP 3264
+#define HEIGHT 2464
+#define WIDTH_RESIZE 1920
+#define HEIGHT_RESIZE 1080
+
+
 #include <cstdint>  // uint64_t 사용을 위한 헤더 추가
 #include <cstdio>   // printf 사용을 위한 헤더 추가
 

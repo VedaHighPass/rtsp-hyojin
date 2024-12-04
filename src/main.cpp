@@ -9,7 +9,7 @@ int main() {
         camera.initFFmpeg("output.h264"); // FFmpeg 초기화: H.264 파일 준비
 //
         // camera.checkFormat();
-        for (int i = 0; i < 100; ++i) {
+        for (int i = 0; i < 500; ++i) {
             for (;;) {  /* 내부 무한 루프: 성공적으로 프레임을 읽을 때까지 반복 */
                 fd_set fds;  /* 파일 디스크립터 셋을 선언: select()로 이벤트를 감시할 파일 디스크립터 */
                 struct timeval tv;  /* 타임아웃을 설정하기 위한 구조체 */
@@ -36,14 +36,7 @@ int main() {
                 if (camera.captureOpencv(camera)) break;
             }
         }
-//
-        // FFmpeg 종료 작업
-        av_write_trailer(camera.fmt_ctx);  // 트레일러 작성
-        avcodec_close(camera.codec_ctx);   // 코덱 닫기
-        avio_close(camera.fmt_ctx->pb);    // 파일 닫기
-        avformat_free_context(camera.fmt_ctx); // 포맷 컨텍스트 해제
-//
-//
+
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return EXIT_FAILURE;
