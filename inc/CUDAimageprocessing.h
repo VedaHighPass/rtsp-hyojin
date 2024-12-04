@@ -2,84 +2,63 @@
 #define CUDA_IMAGE_PROCESSING_H
 
 #include "common.h"
+
 /**
  * @file CUDAImageProcessing.h
- * @brief Header file for CUDA-based image processing functions, including white balance, gamma correction, and image cropping.
+ * @brief Header file for CUDA-based image processing functions, including white balance, gamma correction,
+ *        image cropping, and BGR to YUV420P conversion.
  */
 
 /**
  * @brief Applies white balance and gamma correction to an image stored on the GPU.
  *
- * This function adjusts the white balance and applies gamma correction to an input image
- * represented as a `cv::cuda::GpuMat` with 8-bit 3-channel (RGB) data.
+ * Adjusts the white balance and applies gamma correction to an input image stored as a `cv::cuda::GpuMat`.
+ * The processing is performed in-place.
  *
- * @param[in,out] gpuImage The input image on the GPU (CV_8UC3). The white balance and gamma corrections
- *                         are applied in-place.
- * @param[in] gamma The gamma correction factor. A value less than 1 darkens the image, while a value
- *                  greater than 1 brightens it.
+ * @param[in,out] gpuImage Input/output image on the GPU (CV_8UC3 format).
+ * @param[in] gamma Gamma correction factor. Values < 1 darken the image, values > 1 brighten the image.
  *
- * @note This function assumes that the input image is already in RGB format.
- * @note The input image must be stored in GPU memory and represented as a `cv::cuda::GpuMat`.
+ * @note Assumes the input image is in RGB format.
  */
 void applyWhiteBalanceAndGammaCUDA(cv::cuda::GpuMat& gpuImage, float gamma);
 
 /**
  * @brief Crops and reorganizes a 16-bit Bayer image stored on the GPU.
  *
- * This function crops and reorganizes a Bayer image stored in a single-channel 16-bit format.
- * It processes even and odd rows differently to retain only the meaningful pixel data according
- * to a specific Bayer pattern.
+ * This function processes even and odd rows differently according to a specific Bayer pattern.
+ * The result is stored in a reorganized format.
  *
- * @param[in] src Pointer to the input image data in GPU memory. The source image is in Bayer format,
- *                stored as a single channel (16-bit per pixel).
- * @param[out] dst Pointer to the output image data in GPU memory. The reorganized image data
- *                 will be written to this location.
- * @param[in] srcWidth The width (number of columns) of the input image.
- * @param[in] dstWidth The width (number of columns) of the output image.
- * @param[in] height The height (number of rows) of both the input and output images.
+ * @param[in] src Input Bayer image data in GPU memory (single-channel, 16-bit per pixel).
+ * @param[out] dst Output image data in GPU memory.
+ * @param[in] srcWidth Width of the input image.
+ * @param[in] dstWidth Width of the output image.
+ * @param[in] height Height of both input and output images.
  *
- * @note The memory for `dst` must be allocated before calling this function.
- * @note Both `src` and `dst` must point to memory on the GPU.
+ * @note Ensure memory for `dst` is allocated before calling this function.
  */
 void cropAndReorganizeImageCUDA(const uint16_t* src, uint16_t* dst, int srcWidth, int dstWidth, int height);
-
 
 /**
  * @brief Converts a BGR image to YUV420P format on the GPU.
  *
- * This function converts a `cv::cuda::GpuMat` containing a BGR image to a YUV420P format image.
- * The input image is resized if its resolution exceeds Full HD (1920x1080).
- * The conversion is performed entirely on the GPU using a CUDA kernel.
+ * Converts a `cv::cuda::GpuMat` with BGR image data to YUV420P format. If the resolution exceeds Full HD
+ * (1920x1080), the input image is resized.
  *
- * @param[in] bgrImage The input image on the GPU (CV_8UC3). This must be a BGR-formatted image.
- * @param[out] yuvImage The output image on the GPU (CV_8UC1). The resulting image is in YUV420P format,
- *                      with the Y channel followed by subsampled U and V channels.
+ * @param[in] bgrImage Input BGR image on the GPU (CV_8UC3 format).
+ * @param[out] yuvImage Output YUV420P image on the GPU (CV_8UC1 format).
  *
  * @details
- * The YUV420P format consists of a full-resolution Y channel and subsampled U and V channels
- * (each with 1/4th the number of pixels of the Y channel). This format is widely used in video
- * encoding and processing.
+ * The YUV420P format consists of:
+ * - **Y Channel**: Full-resolution luminance.
+ * - **U/V Channels**: Subsampled chroma channels (1/4th resolution of Y channel).
  *
- * - **Y Channel**: The luminance channel, stored at the start of the output image.
- * - **U Channel**: The chroma channel (blue projection), stored after the Y channel.
- * - **V Channel**: The chroma channel (red projection), stored after the U channel.
- *
- * The CUDA kernel operates on 2D grids of threads, processing the Y channel for every pixel
- * and the U/V channels for every 2x2 block of pixels in the input BGR image.
- *
- * @note
- * - The input and output images must reside in GPU memory and be represented as `cv::cuda::GpuMat`.
- * - The input image is resized to 1920x1080 if its resolution exceeds Full HD.
- * - The output image's memory is automatically allocated and should not be pre-initialized.
- *
- * @warning
- * - Ensure that the input image is in BGR format. Incorrect formats may lead to undefined behavior.
- * - Use CUDA synchronization functions (e.g., `cudaDeviceSynchronize()`) to ensure kernel completion.
+ * Processing:
+ * - Y channel is computed for every pixel.
+ * - U and V channels are subsampled from 2x2 blocks in the input BGR image.
  *
  * Example usage:
  * @code
- * cv::cuda::GpuMat bgrImage = cv::cuda::imread("input.jpg", cv::IMREAD_COLOR);
- * cv::cuda::GpuMat yuvImage;
+ * cv::cuda::GpuMat bgrImage, yuvImage;
  * BGRtoYUV420P(bgrImage, yuvImage);
  * cv::Mat output;
  * yuvImage.download(output);
@@ -87,7 +66,6 @@ void cropAndReorganizeImageCUDA(const uint16_t* src, uint16_t* dst, int srcWidth
  * @endcode
  */
 void BGRtoYUV420P(const cv::cuda::GpuMat& bgrImage, cv::cuda::GpuMat& yuvImage);
-
 
 #endif // CUDA_IMAGE_PROCESSING_H
 
