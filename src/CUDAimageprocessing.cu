@@ -80,6 +80,105 @@ __global__ void cropAndReorganizeImageKernel(const uint16_t* src, uint16_t* dst,
     }
 }
 
+//----------------------------------------------------- CUDA 커널 정의 끝  ------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//----------------------------------------------------- CUDA 커널 Call 함수  정의 시작  -----------------------------------
+
+
+void BGRtoYUV420P(const cv::cuda::GpuMat& bgrImage, cv::cuda::GpuMat& yuvImage)
+{
+    // 이미지 크기 가져오기
+    uint64_t width = bgrImage.cols;
+    uint64_t height = bgrImage.rows;
+    // 할당된 크기 확인
+//     printf("[DEBUG] bgrImage.cols: %d\n", bgrImage.cols);
+//     printf("[DEBUG] bgrImage.rows: %d\n", bgrImage.rows);
+//     printf("[DEBUG] bgrImage.step: %zu\n",bgrImage.step);
+
+
+    // 이미지 리사이즈 (해상도가 너무 클 경우 줄이기)
+    cv::cuda::GpuMat resizedBgrImage;
+    if (width > 1920 || height > 1080) {  // 해상도가 Full HD 이상인 경우
+        cv::cuda::resize(bgrImage, resizedBgrImage, cv::Size(1920, 1080));
+        printf("[DEBUG] 리사이즈된 이미지 크기: %d x %d\n", resizedBgrImage.cols, resizedBgrImage.rows);
+        width = resizedBgrImage.cols;
+        height = resizedBgrImage.rows;
+    } else {
+        resizedBgrImage = bgrImage;
+    }
+    // 할당된 크기 확인
+//     printf("[DEBUG] resizedBgrImage.cols: %d\n", resizedBgrImage.cols);
+//     printf("[DEBUG] resizedBgrImage.rows: %d\n", resizedBgrImage.rows);
+//     printf("[DEBUG] resizedBgrImage.step: %zu\n", resizedBgrImage.step);
+
+
+
+    // 출력 이미지는 Y, U, V를 각각 하나의 채널로 갖는 구조 (YUV420P 형식)
+    yuvImage.create(height * 3 / 2, width, CV_8UC1);
+    // 메모리 할당 확인
+    if (yuvImage.empty()) {
+        printf("YUV 이미지 메모리 할당에 실패했습니다.\n");
+        return;
+    }
+
+    // 할당된 크기 확인
+//     printf("[DEBUG] yuvImage.cols: %d\n", yuvImage.cols);
+//     printf("[DEBUG] yuvImage.rows: %d\n", yuvImage.rows);
+//     printf("[DEBUG] yuvImage.step: %zu\n", yuvImage.step);
+
+
+    // CUDA 커널 설정
+    dim3 threadsPerBlock(16, 16);
+    dim3 numBlocks((width + threadsPerBlock.x - 1) / threadsPerBlock.x,
+                   (height + threadsPerBlock.y - 1) / threadsPerBlock.y);
+
+    // CUDA 커널 호출
+    BGRtoYUV420PKernel<<<numBlocks,
+      threadsPerBlock>>>(resizedBgrImage.ptr<uchar>(), yuvImage.ptr<uchar>(),width, height, resizedBgrImage.step, yuvImage.step);
+
+    // CUDA 동기화 - 커널 실행 완료 대기
+    cudaError_t err = cudaDeviceSynchronize();
+    if (err != cudaSuccess) {
+        printf("CUDA Error: %s\n", cudaGetErrorString(err));
+    }
+
+    // 할당된 크기 확인
+//     printf("[DEBUG] yuvImage.cols: %d\n", yuvImage.cols);
+//     printf("[DEBUG] yuvImage.rows: %d\n", yuvImage.rows);
+//     printf("[DEBUG] yuvImage.step: %zu\n", yuvImage.step);
+
+
+}
+
+
+
+
+// CUDA 기반 크롭 및 재구성 함수
+void cropAndReorganizeImageCUDA(const uint16_t* src, uint16_t* dst, int srcWidth, int dstWidth, int height) {
+    dim3 block(256); // 스레드 블록 크기
+    dim3 grid((dstWidth + block.x - 1) / block.x, height); // 각 행을 처리하는 그리드 크기
+
+    // CUDA 커널 호출
+    cropAndReorganizeImageKernel<<<grid, block>>>(src, dst, srcWidth, dstWidth, height);
+    cudaDeviceSynchronize();
+}
+
+
+
 // 블록 내 모든 요소의 합을 계산하는 CUDA 커널
 __device__ float blockReduceSum(float val) {
     __shared__ float shared[1024];
@@ -159,109 +258,16 @@ __global__ void whiteBalanceAndGammaKernel(uchar3* image, int width, int height,
     image[idx] = pixel;
 }
 
-//----------------------------------------------------- CUDA 커널 정의 끝  ------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//----------------------------------------------------- CUDA 커널 Call 함수  정의 시작  -----------------------------------
-
-
-void BGRtoYUV420P(const cv::cuda::GpuMat& bgrImage, cv::cuda::GpuMat& yuvImage)
-{
-    // 이미지 크기 가져오기
-    uint64_t width = bgrImage.cols;
-    uint64_t height = bgrImage.rows;
-    // 할당된 크기 확인
-    printf("[DEBUG] bgrImage.cols: %d\n", bgrImage.cols);
-    printf("[DEBUG] bgrImage.rows: %d\n", bgrImage.rows);
-    printf("[DEBUG] bgrImage.step: %zu\n",bgrImage.step);
-
-
-    // 이미지 리사이즈 (해상도가 너무 클 경우 줄이기)
-    cv::cuda::GpuMat resizedBgrImage;
-    if (width > 1920 || height > 1080) {  // 해상도가 Full HD 이상인 경우
-        cv::cuda::resize(bgrImage, resizedBgrImage, cv::Size(1920, 1080));
-        printf("[DEBUG] 리사이즈된 이미지 크기: %d x %d\n", resizedBgrImage.cols, resizedBgrImage.rows);
-        width = resizedBgrImage.cols;
-        height = resizedBgrImage.rows;
-    } else {
-        resizedBgrImage = bgrImage;
-    }
-    // 할당된 크기 확인
-    printf("[DEBUG] resizedBgrImage.cols: %d\n", resizedBgrImage.cols);
-    printf("[DEBUG] resizedBgrImage.rows: %d\n", resizedBgrImage.rows);
-    printf("[DEBUG] resizedBgrImage.step: %zu\n", resizedBgrImage.step);
-
-
-
-    // 출력 이미지는 Y, U, V를 각각 하나의 채널로 갖는 구조 (YUV420P 형식)
-    yuvImage.create(height * 3 / 2, width, CV_8UC1);
-    // 메모리 할당 확인
-    if (yuvImage.empty()) {
-        printf("YUV 이미지 메모리 할당에 실패했습니다.\n");
-        return;
-    }
-
-    // 할당된 크기 확인
-    printf("[DEBUG] yuvImage.cols: %d\n", yuvImage.cols);
-    printf("[DEBUG] yuvImage.rows: %d\n", yuvImage.rows);
-    printf("[DEBUG] yuvImage.step: %zu\n", yuvImage.step);
-
-
-    // CUDA 커널 설정
-    dim3 threadsPerBlock(16, 16);
-    dim3 numBlocks((width + threadsPerBlock.x - 1) / threadsPerBlock.x,
-                   (height + threadsPerBlock.y - 1) / threadsPerBlock.y);
-
-    // CUDA 커널 호출
-    BGRtoYUV420PKernel<<<numBlocks,
-      threadsPerBlock>>>(resizedBgrImage.ptr<uchar>(), yuvImage.ptr<uchar>(),width, height, resizedBgrImage.step, yuvImage.step);
-
-    // CUDA 동기화 - 커널 실행 완료 대기
-    cudaError_t err = cudaDeviceSynchronize();
-    if (err != cudaSuccess) {
-        printf("CUDA Error: %s\n", cudaGetErrorString(err));
-    }
-
-    // 할당된 크기 확인
-    printf("[DEBUG] yuvImage.cols: %d\n", yuvImage.cols);
-    printf("[DEBUG] yuvImage.rows: %d\n", yuvImage.rows);
-    printf("[DEBUG] yuvImage.step: %zu\n", yuvImage.step);
-
-
-}
-
-
-
-
-// CUDA 기반 크롭 및 재구성 함수
-void cropAndReorganizeImageCUDA(const uint16_t* src, uint16_t* dst, int srcWidth, int dstWidth, int height) {
-    dim3 block(256); // 스레드 블록 크기
-    dim3 grid((dstWidth + block.x - 1) / block.x, height); // 각 행을 처리하는 그리드 크기
-
-    // CUDA 커널 호출
-    cropAndReorganizeImageKernel<<<grid, block>>>(src, dst, srcWidth, dstWidth, height);
-    cudaDeviceSynchronize();
-}
-
-
-
 // CUDA 기반 화이트 밸런스 및 감마 보정 적용 함수
 void applyWhiteBalanceAndGammaCUDA(cv::cuda::GpuMat& gpuImage, float gamma) {
     dim3 block(16, 16);
     dim3 grid((gpuImage.cols + block.x - 1) / block.x, (gpuImage.rows + block.y - 1) / block.y);
+
+    // 할당된 크기 확인
+    printf("[DEBUG] gpuImage.cols: %d\n", gpuImage.cols);
+    printf("[DEBUG] gpuImage.rows: %d\n", gpuImage.rows);
+    printf("[DEBUG] gpuImage.step: %zu\n", gpuImage.step);
+
 
     uchar3* d_image = (uchar3*)gpuImage.data;
 
@@ -272,6 +278,12 @@ void applyWhiteBalanceAndGammaCUDA(cv::cuda::GpuMat& gpuImage, float gamma) {
 
     computeChannelMean<<<grid, block>>>(d_image, gpuImage.cols, gpuImage.rows, d_mean);
     cudaDeviceSynchronize();
+
+    // 할당된 크기 확인
+    printf("[DEBUG] gpuImage.cols: %d\n", gpuImage.cols);
+    printf("[DEBUG] gpuImage.rows: %d\n", gpuImage.rows);
+    printf("[DEBUG] gpuImage.step: %zu\n", gpuImage.step);
+
 
     float h_mean[3];
     cudaMemcpy(h_mean, d_mean, 3 * sizeof(float), cudaMemcpyDeviceToHost);
@@ -289,6 +301,12 @@ void applyWhiteBalanceAndGammaCUDA(cv::cuda::GpuMat& gpuImage, float gamma) {
     // 화이트 밸런스 및 감마 보정 커널 호출
     whiteBalanceAndGammaKernel<<<grid, block>>>(d_image, gpuImage.cols, gpuImage.rows, rGain, gGain, bGain, gamma);
     cudaDeviceSynchronize();
+
+    // 할당된 크기 확인
+    printf("[DEBUG] gpuImage.cols: %d\n", gpuImage.cols);
+    printf("[DEBUG] gpuImage.rows: %d\n", gpuImage.rows);
+    printf("[DEBUG] gpuImage.step: %zu\n", gpuImage.step);
+
 
     cudaFree(d_mean);
 }
