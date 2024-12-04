@@ -935,13 +935,13 @@ void Camera::encodeFrame(const cv::Mat& cpuYUV420p, size_t size) {
     memcpy(frame->data[1], cpuYUV420p.data + y_size, uv_size);     // U 채널
     memcpy(frame->data[2], cpuYUV420p.data + y_size + uv_size, uv_size); // V 채널
 
-    for( ; i < 1 ; i++)
-    {
-      printf("FFmpeg linesize[0] (Y): %d\n", frame->linesize[0]);
-      printf("FFmpeg linesize[1] (U): %d\n", frame->linesize[1]);
-      printf("FFmpeg linesize[2] (V): %d\n", frame->linesize[2]);
-
-    }
+//     for( ; i < 1 ; i++)
+//     {
+//       printf("FFmpeg linesize[0] (Y): %d\n", frame->linesize[0]);
+//       printf("FFmpeg linesize[1] (U): %d\n", frame->linesize[1]);
+//       printf("FFmpeg linesize[2] (V): %d\n", frame->linesize[2]);
+//
+//     }
 // //FFmpeg의 linesize > OpenCV의 step
 // int y_stride = codec_ctx->width;          // OpenCV에서 한 행의 stride (Y 채널: 1920)
 // int uv_stride = codec_ctx->width / 2;     // U/V 채널: 960
