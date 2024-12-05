@@ -18,7 +18,7 @@ void VideoCapture::pushImg(unsigned char* imgPtr, int size) {
 
 std::pair<unsigned char*, int> VideoCapture::popImg() {
     std::pair<unsigned char*, int> ret = imgBuffer.front();
-//    std::cout << "POP _ imgBufferSize = "<< imgBuffer.size() << "(" << "," << ret.second <<")" <<std::endl;
+    std::cout << "POP _ imgBufferSize = "<< imgBuffer.size() << "(" << "," << ret.second <<")" <<std::endl;
     imgBufferMutex.lock();
     imgBuffer.pop();
     imgBufferMutex.unlock();

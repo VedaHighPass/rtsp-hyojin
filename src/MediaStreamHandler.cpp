@@ -115,11 +115,8 @@ void MediaStreamHandler::HandleMediaStream()
                 while (!VideoCapture::getInstance().isEmptyBuffer())
                 {
                     std::pair<const uint8_t *, int64_t> cur_frame = VideoCapture::getInstance().popImg();
-                    //AVPacket* cur_frame = VideoCapture::getInstance().popImg();
                     const auto ptr_cur_frame = cur_frame.first;
                     const auto cur_frame_size = cur_frame.second;
-                    //const auto ptr_cur_frame = cur_frame->data;
-                    //const auto cur_frame_size = cur_frame->size;
                     if(ptr_cur_frame == nullptr || cur_frame_size <= 0){
                       std::cout << "Not Ready\n";
                       continue;
@@ -136,7 +133,7 @@ void MediaStreamHandler::HandleMediaStream()
                     // 주기적으로 RTCP Sender Report 전송
                     packetCount++;
                     octetCount += cur_frame_size;
-                    timestamp += 3000;
+                    timestamp += 1000;
                     delete (ptr_cur_frame);
                     //av_packet_unref(cur_frame); //memory 할당 해제
                 }

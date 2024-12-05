@@ -54,7 +54,7 @@ int main() {
                 /* 프레임을 읽음: read_frame() 함수를 호출해 프레임을 읽음 */
                 //if (camera.captureFrame(framebuffer)) break;  /* 프레임이 성공적으로 읽히면 무한 루프를 종료하고 다음 프레임 처리로 이동 */
 //
-                usleep(20000);
+//              usleep(20000);
 //
                 if (camera.captureOpencv(camera)) break;
             }
