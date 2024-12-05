@@ -10,13 +10,13 @@ public:
         return instance;
     }
     inline int GetBufferSize() { return imgBuffer.size(); };
-    //void pushImg(unsigned char* imgPtr, int size);
-    void pushImg(AVPacket* imgPtr);
-    //std::pair<unsigned char*, int> popImg();
-    AVPacket* popImg();
+    void pushImg(unsigned char* imgPtr, int size);
+    //void pushImg(AVPacket* imgPtr);
+    std::pair<unsigned char*, int> popImg();
+    //AVPacket* popImg();
 
 private:
-    //std::queue <std::pair<unsigned char*, int>> imgBuffer;
-    std::queue<AVPacket*> imgBuffer;
+    std::queue <std::pair<unsigned char*, int>> imgBuffer;
+    //std::queue<AVPacket*> imgBuffer;
     std::mutex imgBufferMutex;
 };

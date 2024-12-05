@@ -989,8 +989,9 @@ void Camera::encodeFrame(const cv::Mat& cpuYUV420p, size_t size) {
         }
 
         if (packet->size > 0 && packet->data) {
-            //VideoCapture::getInstance().pushImg(packet->data, packet->size);
-            VideoCapture::getInstance().pushImg(packet);
+            VideoCapture::getInstance().pushImg(packet->data, packet->size);
+            std::cout << packet<< std::endl;
+            //VideoCapture::getInstance().pushImg(packet);
         }
 
         //인코딩된 패킷을 출력파일에 기록한 후 패킷을 해제함(unref)
@@ -1000,7 +1001,7 @@ void Camera::encodeFrame(const cv::Mat& cpuYUV420p, size_t size) {
         // pkt : 인코딩된 비디오또는 오디오 데이터 포함하고있음. 이 데이터를 출력파일에 기록하는것
  //     av_interleaved_write_frame(fmt_ctx, packet);      // 패킷을 파일에 기록
         // 패킷에 할당된 메모리를 해제. 인코딩된 데이터를 파일에 기록한 후 메모리 해제해야함
-    //  av_packet_unref(packet);
+        av_packet_unref(packet);
 
     }
 

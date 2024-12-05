@@ -114,12 +114,12 @@ void MediaStreamHandler::HandleMediaStream()
                 while (VideoCapture::getInstance().GetBufferSize() > 0)
                 {
                     std::cout << "SEND PACKET\n";
-                    //std::pair<const uint8_t *, int64_t> cur_frame = VideoCapture::getInstance().popImg();
-                    AVPacket* cur_frame = VideoCapture::getInstance().popImg();
-                    //const auto ptr_cur_frame = cur_frame.first;
-                    //const auto cur_frame_size = cur_frame.second;
-                    const auto ptr_cur_frame = cur_frame->data;
-                    const auto cur_frame_size = cur_frame->size;
+                    std::pair<const uint8_t *, int64_t> cur_frame = VideoCapture::getInstance().popImg();
+                    //AVPacket* cur_frame = VideoCapture::getInstance().popImg();
+                    const auto ptr_cur_frame = cur_frame.first;
+                    const auto cur_frame_size = cur_frame.second;
+                    //const auto ptr_cur_frame = cur_frame->data;
+                    //const auto cur_frame_size = cur_frame->size;
                     if(ptr_cur_frame == nullptr || cur_frame_size <= 0){
                       continue;
                     }
@@ -137,8 +137,8 @@ void MediaStreamHandler::HandleMediaStream()
                     packetCount++;
                     octetCount += cur_frame_size;
                     timestamp += 3000;
-                    //delete (ptr_cur_frame);
-                    av_packet_unref(cur_frame); //memory 할당 해제
+                    delete (ptr_cur_frame);
+                    //av_packet_unref(cur_frame); //memory 할당 해제
                 }
 //                const auto sleepPeriod = uint32_t(1000 * 1000 / 30.0);
               usleep(10 * 1000);
