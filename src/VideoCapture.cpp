@@ -2,25 +2,41 @@
 #include <cstring>
 #include <iostream>
 
-
 void VideoCapture::pushImg(unsigned char* imgPtr, int size) {
-    if(bufferOpen & imgBuffer.size() < 10){
-//        std::cout << "PUSH _ imgBufferSize = "<< imgBuffer.size() <<"("<< size<<")" <<std::endl;
-        unsigned char* buffer = new unsigned char[size];
-        memcpy(buffer, imgPtr, size);
-        imgBufferMutex.lock();
-        imgBuffer.push(std::make_pair(buffer, size));
-        imgBufferMutex.unlock();
+    std::lock_guard<std::mutex> lock(imgBufferMutex);
 
-//        std::cout << "PUSH _ imgBufferSize = "<< imgBuffer.size() <<std::endl;
+    if (bufferOpen && !isFullBuffer()) {
+        if (imgBuffer[tail].first == nullptr) {
+            imgBuffer[tail].first = new unsigned char[size]; // 메모리 할당
+        } else if (imgBuffer[tail].second < size) {
+            delete[] imgBuffer[tail].first;
+            imgBuffer[tail].first = new unsigned char[size]; // 재할당
+        }
+
+        memcpy(imgBuffer[tail].first, imgPtr, size);
+        imgBuffer[tail].second = size;
+
+        tail = (tail + 1) % buffer_max_size; // tail 위치 갱신
+        buffer_size++;
+
+        std::cout << "PUSH _ imgBufferSize = " << buffer_size << " (" << size << ")" << std::endl;
     }
 }
 
 std::pair<unsigned char*, int> VideoCapture::popImg() {
-    std::pair<unsigned char*, int> ret = imgBuffer.front();
-    std::cout << "POP _ imgBufferSize = "<< imgBuffer.size() << "(" << "," << ret.second <<")" <<std::endl;
-    imgBufferMutex.lock();
-    imgBuffer.pop();
-    imgBufferMutex.unlock();
+    std::lock_guard<std::mutex> lock(imgBufferMutex);
+
+    if (isEmptyBuffer()) {
+        std::cerr << "POP _ Buffer is empty!" << std::endl;
+        return std::make_pair(nullptr, 0);
+    }
+
+    auto ret = imgBuffer[head];
+    head = (head + 1) % buffer_max_size; // head 위치 갱신
+    buffer_size--;
+
+    std::cout << "POP _ imgBufferSize = " << buffer_size << " (" << ret.second << ")" << std::endl;
+
     return ret;
 }
+

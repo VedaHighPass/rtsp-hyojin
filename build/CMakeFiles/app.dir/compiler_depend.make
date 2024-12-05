@@ -2064,16 +2064,10 @@ CMakeFiles/app.dir/src/MediaStreamHandler.cpp.o: ../src/MediaStreamHandler.cpp \
   /usr/include/c++/11/stdexcept \
   /usr/include/c++/11/bits/unique_lock.h \
   ../inc/VideoCapture.h \
-  /usr/include/c++/11/queue \
-  /usr/include/c++/11/deque \
-  /usr/include/c++/11/bits/stl_deque.h \
-  /usr/include/c++/11/bits/deque.tcc \
   /usr/include/c++/11/vector \
   /usr/include/c++/11/bits/stl_vector.h \
   /usr/include/c++/11/bits/stl_bvector.h \
   /usr/include/c++/11/bits/vector.tcc \
-  /usr/include/c++/11/bits/stl_heap.h \
-  /usr/include/c++/11/bits/stl_queue.h \
   /usr/include/c++/11/mutex \
   ../inc/CUDAimageprocessing.h \
   ../inc/common.h \
@@ -2175,6 +2169,7 @@ CMakeFiles/app.dir/src/MediaStreamHandler.cpp.o: ../src/MediaStreamHandler.cpp \
   /usr/include/c++/11/algorithm \
   /usr/include/c++/11/bits/stl_algo.h \
   /usr/include/c++/11/bits/algorithmfwd.h \
+  /usr/include/c++/11/bits/stl_heap.h \
   /usr/include/c++/11/bits/uniform_int_dist.h \
   /usr/include/c++/11/pstl/glue_algorithm_defs.h \
   /usr/include/c++/11/functional \
@@ -2316,6 +2311,11 @@ CMakeFiles/app.dir/src/MediaStreamHandler.cpp.o: ../src/MediaStreamHandler.cpp \
   /usr/include/c++/11/bits/stl_list.h \
   /usr/include/c++/11/bits/list.tcc \
   /usr/local/include/opencv4/opencv2/stitching/detail/util_inl.hpp \
+  /usr/include/c++/11/queue \
+  /usr/include/c++/11/deque \
+  /usr/include/c++/11/bits/stl_deque.h \
+  /usr/include/c++/11/bits/deque.tcc \
+  /usr/include/c++/11/bits/stl_queue.h \
   /usr/local/include/opencv4/opencv2/stitching/detail/camera.hpp \
   /usr/local/include/opencv4/opencv2/stitching/detail/exposure_compensate.hpp \
   /usr/local/include/opencv4/opencv2/stitching/detail/seam_finders.hpp \
@@ -3282,8 +3282,7 @@ CMakeFiles/app.dir/src/UDPHandler.cpp.o: ../src/UDPHandler.cpp \
 CMakeFiles/app.dir/src/VideoCapture.cpp.o: ../src/VideoCapture.cpp \
   /usr/include/stdc-predef.h \
   ../inc/VideoCapture.h \
-  /usr/include/c++/11/queue \
-  /usr/include/c++/11/deque \
+  /usr/include/c++/11/vector \
   /usr/include/c++/11/bits/stl_algobase.h \
   /usr/include/aarch64-linux-gnu/c++/11/bits/c++config.h \
   /usr/include/aarch64-linux-gnu/c++/11/bits/os_defines.h \
@@ -3323,26 +3322,19 @@ CMakeFiles/app.dir/src/VideoCapture.cpp.o: ../src/VideoCapture.cpp \
   /usr/include/c++/11/bits/stl_uninitialized.h \
   /usr/include/c++/11/ext/alloc_traits.h \
   /usr/include/c++/11/bits/alloc_traits.h \
-  /usr/include/c++/11/bits/stl_deque.h \
-  /usr/include/c++/11/initializer_list \
-  /usr/include/c++/11/bits/range_access.h \
-  /usr/include/c++/11/bits/deque.tcc \
-  /usr/include/c++/11/vector \
   /usr/include/c++/11/bits/stl_vector.h \
+  /usr/include/c++/11/initializer_list \
   /usr/include/c++/11/bits/stl_bvector.h \
   /usr/include/c++/11/bits/functional_hash.h \
   /usr/include/c++/11/bits/hash_bytes.h \
+  /usr/include/c++/11/bits/range_access.h \
   /usr/include/c++/11/bits/vector.tcc \
-  /usr/include/c++/11/bits/stl_heap.h \
-  /usr/include/c++/11/bits/stl_function.h \
-  /usr/include/c++/11/backward/binders.h \
-  /usr/include/c++/11/bits/stl_queue.h \
-  /usr/include/c++/11/bits/uses_allocator.h \
   /usr/include/c++/11/mutex \
   /usr/include/c++/11/tuple \
   /usr/include/c++/11/utility \
   /usr/include/c++/11/bits/stl_relops.h \
   /usr/include/c++/11/array \
+  /usr/include/c++/11/bits/uses_allocator.h \
   /usr/include/c++/11/bits/invoke.h \
   /usr/include/c++/11/chrono \
   /usr/include/c++/11/ratio \
@@ -3416,6 +3408,8 @@ CMakeFiles/app.dir/src/VideoCapture.cpp.o: ../src/VideoCapture.cpp \
   /usr/include/ctype.h \
   /usr/include/c++/11/bits/ostream_insert.h \
   /usr/include/c++/11/bits/cxxabi_forced.h \
+  /usr/include/c++/11/bits/stl_function.h \
+  /usr/include/c++/11/backward/binders.h \
   /usr/include/c++/11/bits/basic_string.h \
   /usr/include/c++/11/ext/atomicity.h \
   /usr/include/aarch64-linux-gnu/c++/11/bits/gthr.h \
@@ -3599,6 +3593,7 @@ CMakeFiles/app.dir/src/VideoCapture.cpp.o: ../src/VideoCapture.cpp \
   /usr/include/c++/11/algorithm \
   /usr/include/c++/11/bits/stl_algo.h \
   /usr/include/c++/11/bits/algorithmfwd.h \
+  /usr/include/c++/11/bits/stl_heap.h \
   /usr/include/c++/11/bits/stl_tempbuf.h \
   /usr/include/c++/11/bits/uniform_int_dist.h \
   /usr/include/c++/11/pstl/glue_algorithm_defs.h \
@@ -3765,6 +3760,11 @@ CMakeFiles/app.dir/src/VideoCapture.cpp.o: ../src/VideoCapture.cpp \
   /usr/include/c++/11/bits/stl_list.h \
   /usr/include/c++/11/bits/list.tcc \
   /usr/local/include/opencv4/opencv2/stitching/detail/util_inl.hpp \
+  /usr/include/c++/11/queue \
+  /usr/include/c++/11/deque \
+  /usr/include/c++/11/bits/stl_deque.h \
+  /usr/include/c++/11/bits/deque.tcc \
+  /usr/include/c++/11/bits/stl_queue.h \
   /usr/local/include/opencv4/opencv2/stitching/detail/camera.hpp \
   /usr/local/include/opencv4/opencv2/stitching/detail/exposure_compensate.hpp \
   /usr/local/include/opencv4/opencv2/stitching/detail/seam_finders.hpp \
