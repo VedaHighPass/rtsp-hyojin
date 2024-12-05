@@ -5,6 +5,8 @@
 #include <alsa/asoundlib.h>
 #include <condition_variable>
 
+#define MAX_PACKET_SIZE 1500
+
 enum MediaStreamState{
     eMediaStream_Init,
     eMediaStream_Play,

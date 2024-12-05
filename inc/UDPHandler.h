@@ -14,7 +14,7 @@ public:
 
     bool CreateUDPSocket();
 
-    void SendSenderReport(Protos::SenderReport* senderReport, size_t srSize);
+//    void SendSenderReport(Protos::SenderReport* senderReport, size_t srSize);
 
     int& GetRTPSocket();
     int& GetRTCPSocket();

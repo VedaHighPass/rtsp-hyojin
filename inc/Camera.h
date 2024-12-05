@@ -3,6 +3,8 @@
 
 #include "common.h"
 #include "FrameBuffer.h"
+#include "CUDAimageprocessing.h"
+#include "VideoCapture.h"
 
 // VIDEODEV "/dev/video0"
 // WIDTH 640

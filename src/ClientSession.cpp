@@ -36,7 +36,6 @@ std::pair<int, int> ClientSession::GetPort() const {
 }
 
 void ClientSession::SetState(const std::string& newState) {
-    // std::lock_guard<std::mutex> lock(mtx);
     info->state = newState;
     info->version++;
 }

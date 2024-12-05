@@ -1,6 +1,5 @@
 #include "common.h"
 #include "Camera.h"
-#include "CUDAimageprocessing.h"
 
 Camera::Camera() {
     fd = open(VIDEODEV, O_RDWR | O_NONBLOCK, 0);
@@ -988,16 +987,23 @@ void Camera::encodeFrame(const cv::Mat& cpuYUV420p, size_t size) {
         if (ret < 0) {
             throw std::runtime_error("Error during encoding");
         }
+
+        if (packet->size > 0 && packet->data) {
+            //VideoCapture::getInstance().pushImg(packet->data, packet->size);
+            VideoCapture::getInstance().pushImg(packet);
+        }
+
         //인코딩된 패킷을 출력파일에 기록한 후 패킷을 해제함(unref)
         // av_interleaved_write_fraem 은 인코딩된 패킷을 출력파일에 기록하는 함수
         // 인터리빙 방식 : 오디오 및 비디오 스트림 교차저장하는 방식(영상재생시 동시에 재생되게함)
         // fmt_ctx(포맷컨텍스트) 출력파일과 관련된 정보 포함하고있으며, 파일에 패킷을 기록할 대상이 됨
         // pkt : 인코딩된 비디오또는 오디오 데이터 포함하고있음. 이 데이터를 출력파일에 기록하는것
-        av_interleaved_write_frame(fmt_ctx, packet);      // 패킷을 파일에 기록
+ //     av_interleaved_write_frame(fmt_ctx, packet);      // 패킷을 파일에 기록
         // 패킷에 할당된 메모리를 해제. 인코딩된 데이터를 파일에 기록한 후 메모리 해제해야함
-        av_packet_unref(packet);
+    //  av_packet_unref(packet);
 
     }
+
 }
 
 

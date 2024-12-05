@@ -36,14 +36,11 @@ set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}
     -O3
     -gencode arch=compute_87,code=sm_87 # Jetson Orin Nano에 맞는 아키텍처 설정
 )
+# src 디렉토리의 모든 .cpp 파일 추가
+file(GLOB_RECURSE SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 
-# 소스 파일 리스트 정의
-set(SOURCES
-    ${CMAKE_SOURCE_DIR}/src/main.cpp
-    ${CMAKE_SOURCE_DIR}/src/Camera.cpp
-    ${CMAKE_SOURCE_DIR}/src/FrameBuffer.cpp
-)
-
+# src 디렉토리의 모든 .cu 파일 추가
+# file(GLOB_RECURSE CUDA_SOURCES ${CMAKE_SOURCE_DIR}/src/*.cu)
 
 # CUDA 소스 파일 정의
 set(CUDA_SOURCES

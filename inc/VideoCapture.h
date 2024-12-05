@@ -1,5 +1,6 @@
 #include <queue>
 #include <mutex>
+#include <CUDAimageprocessing.h>
 
 class VideoCapture{
 public:
@@ -8,10 +9,14 @@ public:
         static VideoCapture instance;
         return instance;
     }
-    inline int getImgBufferSize() { return imgBuffer.size(); };
-    void pushImg(unsigned char* imgPtr, int size);
-    std::pair<unsigned char*, int> popImg();
+    inline int GetBufferSize() { return imgBuffer.size(); };
+    //void pushImg(unsigned char* imgPtr, int size);
+    void pushImg(AVPacket* imgPtr);
+    //std::pair<unsigned char*, int> popImg();
+    AVPacket* popImg();
+
 private:
-    std::queue <std::pair<unsigned char*, int>> imgBuffer;
+    //std::queue <std::pair<unsigned char*, int>> imgBuffer;
+    std::queue<AVPacket*> imgBuffer;
     std::mutex imgBufferMutex;
 };

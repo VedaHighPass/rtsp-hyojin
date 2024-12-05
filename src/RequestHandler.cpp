@@ -33,6 +33,7 @@ void RequestHandler::HandleRequest() {
             return;
         }
 
+        std::cout << "METHOD = "<<method<<std::endl;
         if (method == "OPTIONS") {
             HandleOptionsRequest(cseq);
         } else if (method == "DESCRIBE") {
@@ -88,7 +89,7 @@ std::pair<int, int> RequestHandler::ParsePorts(const std::string& request) {
                 size_t dashPos = portRange.find('-');
 
                 if (dashPos != std::string::npos) {
-                    
+
                     int rtpPort = stoi(portRange.substr(eqPos, dashPos - eqPos));
                     int rtcpPort = stoi(portRange.substr(dashPos + 1));
 		            return {rtpPort, rtcpPort};
@@ -176,6 +177,7 @@ void RequestHandler::HandleSetupRequest(const std::string& request, int cseq) {
 }
 
 void RequestHandler::HandlePlayRequest(int cseq) {
+    std::cout<< "PLAY REQUEST START\n";
     client->state = "PLAY";
 
     std::string response = "RTSP/1.0 200 OK\r\n"

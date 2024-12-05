@@ -1,8 +1,8 @@
 #include "common.h"
+#include "FrameBuffer.h"
 #include "Camera.h"
-#include "CUDAimageprocessing.h"
 #include "ClientSession.h"
-#include "VideoCapture"
+#include "TCPHandler.h"
 
 int main() {
     // Start RTSP Server
@@ -19,10 +19,10 @@ int main() {
 
 
     //**** TODO : example) rtsp로 전송할 이미지를 VideoCapture Queue로 던지기 ***** */
-    std::pair<const unsigned char*, const unsigned int> cur_frame = h264_file->get_next_frame();
-    unsigned char* ptr_cur_frame = cur_frame.first;
-    unsigned int cur_frame_size = cur_frame.second;
-    VideoCapture::getInstance().pushImg((unsigned char *)ptr_cur_frame, cur_frame_size);
+   // std::pair<const unsigned char*, const unsigned int> cur_frame = h264_file->get_next_frame();
+   // unsigned char* ptr_cur_frame = cur_frame.first;
+   // unsigned int cur_frame_size = cur_frame.second;
+   // VideoCapture::getInstance().pushImg((unsigned char *)ptr_cur_frame, cur_frame_size);
     //********************************************************* */
 
     try
@@ -54,6 +54,7 @@ int main() {
                 /* 프레임을 읽음: read_frame() 함수를 호출해 프레임을 읽음 */
                 //if (camera.captureFrame(framebuffer)) break;  /* 프레임이 성공적으로 읽히면 무한 루프를 종료하고 다음 프레임 처리로 이동 */
 //
+                usleep(20000);
 //
                 if (camera.captureOpencv(camera)) break;
             }

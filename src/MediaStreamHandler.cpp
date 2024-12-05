@@ -1,4 +1,4 @@
-#include "Protos.h"
+//#include "Protos.h"
 #include "utils.h"
 #include "TCPHandler.h"
 #include "UDPHandler.h"
@@ -65,7 +65,7 @@ void MediaStreamHandler::SendFragmentedRTPPackets(unsigned char* payload, size_t
     if(remainPacketSize > 0) {
         rtpPacket.get_payload()[0] = (nalHeader & NALU_F_NRI_MASK) | SET_FU_A_MASK;
         rtpPacket.get_payload()[1]= (nalHeader & NALU_TYPE_MASK) | FU_E_MASK;
-        
+
         rtpPacket.get_header().set_marker(1);
         // RTP 패킷 생성
         memcpy(rtpPacket.get_payload() + FU_SIZE, &payload[pos], remainPacketSize); // 분할된 데이터 복사
@@ -83,7 +83,7 @@ void MediaStreamHandler::HandleMediaStream()
     uint32_t timestamp = (uint32_t)utils::GetRanNum(16);
 
     int ssrcNum = 0;
-    
+
 
     // RTP 헤더 생성
     RtpHeader rtpHeader(0, 0, ssrcNum);
@@ -96,49 +96,69 @@ void MediaStreamHandler::HandleMediaStream()
 
     while (true) {
         if(streamState == MediaStreamState::eMediaStream_Pause) {
+     //       std::cout << "SERVER ========== PAUSE\n";
             std::unique_lock<std::mutex> lck(streamMutex);
             condition.wait(lck);
         }
         else if (streamState == MediaStreamState::eMediaStream_Teardown) {
+   //         std::cout << "SERVER ========== TEARDOWN\n";
             break;
         }
         else if (streamState == MediaStreamState::eMediaStream_Play)
         {
+ //           std::cout << "SERVER ========== PLAY\n";
             VideoCapture::getInstance().bufferOpen = true;  //rtsp 이미지 버퍼 열기
 
             while (1)
             {
-                while (VideoCapture::getInstance().getImgBufferSize() > 0)
+                while (VideoCapture::getInstance().GetBufferSize() > 0)
                 {
-                    std::pair<const uint8_t *, int64_t> cur_frame = VideoCapture::getInstance().popImg();
-                    const auto ptr_cur_frame = cur_frame.first;
-                    const auto cur_frame_size = cur_frame.second;
-
+                    std::cout << "SEND PACKET\n";
+                    //std::pair<const uint8_t *, int64_t> cur_frame = VideoCapture::getInstance().popImg();
+                    AVPacket* cur_frame = VideoCapture::getInstance().popImg();
+                    //const auto ptr_cur_frame = cur_frame.first;
+                    //const auto cur_frame_size = cur_frame.second;
+                    const auto ptr_cur_frame = cur_frame->data;
+                    const auto cur_frame_size = cur_frame->size;
+                    if(ptr_cur_frame == nullptr || cur_frame_size <= 0){
+                      continue;
+                    }
                     // RTP 패킷 전송 (FU-A 분할 포함)
+                    std::cout <<"test001\n";
+                    for(int i=0; i<10; i++){
+                      printf("%x ", ptr_cur_frame[i]);
+                    }
+
                     const int64_t start_code_len = H264Encoder::is_start_code(ptr_cur_frame, cur_frame_size, 4) ? 4 : 3;
                     SendFragmentedRTPPackets((unsigned char *)ptr_cur_frame + start_code_len, cur_frame_size - start_code_len, rtpPack, timestamp);
 
+                    std::cout <<"test002\n";
                     // 주기적으로 RTCP Sender Report 전송
                     packetCount++;
                     octetCount += cur_frame_size;
                     timestamp += 3000;
-
-                    const auto sleepPeriod = uint32_t(1000 * 1000 / 30.0);
-                    usleep(sleepPeriod);
+                    //delete (ptr_cur_frame);
+                    av_packet_unref(cur_frame); //memory 할당 해제
                 }
+//                const auto sleepPeriod = uint32_t(1000 * 1000 / 30.0);
+              usleep(10 * 1000);
             }
         }
+        usleep(100);
     }
 }
 
 void MediaStreamHandler::SetCmd(const std::string& cmd) {
     std::lock_guard<std::mutex> lock(streamMutex);
     if (cmd == "PLAY") {
+        std::cout << "CHANGED SetCmd() TO PLAY"<<std::endl;
         streamState = MediaStreamState::eMediaStream_Play;
         condition.notify_all();
     } else if (cmd == "PAUSE") {
+        std::cout << "CHANGED SetCmd() TO PAUSE"<<std::endl;
         streamState = MediaStreamState::eMediaStream_Pause;
     } else if (cmd == "TEARDOWN") {
+        std::cout << "CHANGED SetCmd() TO TEARDOWN"<<std::endl;
         streamState = MediaStreamState::eMediaStream_Teardown;
     }
 }
