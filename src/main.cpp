@@ -1,10 +1,32 @@
 #include "common.h"
 #include "Camera.h"
 #include "CUDAimageprocessing.h"
+#include "ClientSession.h"
+#include "VideoCapture"
 
 int main() {
-//
-  try {
+    // Start RTSP Server
+    std::thread([]() -> void
+                {
+        while(1){
+            std::pair<int, std::string> newClient = TCPHandler::GetInstance().AcceptClientConnection();
+            std::cout<<"Client connected" << std::endl;
+
+            ClientSession* clientSession = new ClientSession(newClient);
+            clientSession->StartRequestHandlerThread();
+        } })
+        .detach();
+
+
+    //**** TODO : example) rtsp로 전송할 이미지를 VideoCapture Queue로 던지기 ***** */
+    std::pair<const unsigned char*, const unsigned int> cur_frame = h264_file->get_next_frame();
+    unsigned char* ptr_cur_frame = cur_frame.first;
+    unsigned int cur_frame_size = cur_frame.second;
+    VideoCapture::getInstance().pushImg((unsigned char *)ptr_cur_frame, cur_frame_size);
+    //********************************************************* */
+
+    try
+    {
         Camera camera;
         camera.initFFmpeg("output.h264"); // FFmpeg 초기화: H.264 파일 준비
 //
