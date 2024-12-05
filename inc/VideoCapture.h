@@ -9,14 +9,12 @@ public:
         static VideoCapture instance;
         return instance;
     }
-    inline int GetBufferSize() { return imgBuffer.size(); };
+//    inline int GetBufferSize() { return imgBuffer.size(); };
+    inline bool isEmptyBuffer() { return imgBuffer.empty(); };
     void pushImg(unsigned char* imgPtr, int size);
-    //void pushImg(AVPacket* imgPtr);
     std::pair<unsigned char*, int> popImg();
-    //AVPacket* popImg();
 
 private:
     std::queue <std::pair<unsigned char*, int>> imgBuffer;
-    //std::queue<AVPacket*> imgBuffer;
     std::mutex imgBufferMutex;
 };

@@ -111,9 +111,9 @@ void MediaStreamHandler::HandleMediaStream()
 
             while (1)
             {
-                while (VideoCapture::getInstance().GetBufferSize() > 0)
+                //while (VideoCapture::getInstance().GetBufferSize() > 0)
+                while (!VideoCapture::getInstance().isEmptyBuffer())
                 {
-                    std::cout << "SEND PACKET\n";
                     std::pair<const uint8_t *, int64_t> cur_frame = VideoCapture::getInstance().popImg();
                     //AVPacket* cur_frame = VideoCapture::getInstance().popImg();
                     const auto ptr_cur_frame = cur_frame.first;
@@ -121,18 +121,18 @@ void MediaStreamHandler::HandleMediaStream()
                     //const auto ptr_cur_frame = cur_frame->data;
                     //const auto cur_frame_size = cur_frame->size;
                     if(ptr_cur_frame == nullptr || cur_frame_size <= 0){
+                      std::cout << "Not Ready\n";
                       continue;
                     }
+
                     // RTP 패킷 전송 (FU-A 분할 포함)
-                    std::cout <<"test001\n";
-                    for(int i=0; i<10; i++){
-                      printf("%x ", ptr_cur_frame[i]);
-                    }
+                    //for(int i=0; i<10; i++){
+                    //  printf("%x ", ptr_cur_frame[i]);
+                    //}
 
                     const int64_t start_code_len = H264Encoder::is_start_code(ptr_cur_frame, cur_frame_size, 4) ? 4 : 3;
                     SendFragmentedRTPPackets((unsigned char *)ptr_cur_frame + start_code_len, cur_frame_size - start_code_len, rtpPack, timestamp);
 
-                    std::cout <<"test002\n";
                     // 주기적으로 RTCP Sender Report 전송
                     packetCount++;
                     octetCount += cur_frame_size;
@@ -141,7 +141,7 @@ void MediaStreamHandler::HandleMediaStream()
                     //av_packet_unref(cur_frame); //memory 할당 해제
                 }
 //                const auto sleepPeriod = uint32_t(1000 * 1000 / 30.0);
-              usleep(10 * 1000);
+//              usleep(10 * 1000);
             }
         }
         usleep(100);
