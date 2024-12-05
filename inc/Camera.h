@@ -33,6 +33,8 @@ private:
     struct Buffer *buffers = NULL;
     volatile unsigned int n_buffers = 0;      /* 버퍼 개수 */
 
+    AVStream* video_stream;
+
     AVCodecContext *codec_ctx;      // FFmpeg 코덱 컨텍스트
     AVFormatContext *fmt_ctx;       // FFmpeg 포맷 컨텍스트
     AVPacket *packet;               // FFmpeg 패킷 (인코딩된 데이터 저장)

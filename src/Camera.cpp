@@ -1,5 +1,9 @@
 #include "common.h"
 #include "Camera.h"
+#include <iostream>
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+#include <libavutil/opt.h>
 
 Camera::Camera() {
     fd = open(VIDEODEV, O_RDWR | O_NONBLOCK, 0);
@@ -39,20 +43,40 @@ int Camera::get_fd() const {
     return fd;
 }
 
+const char* rtsp_url = "rtsp://localhost:8554/live";
 
 void Camera::initFFmpeg(const char *filename) {
+    avformat_network_init();
+    std::cout<<"test001"<<std::endl;
+    // 1. Output Format Context 생성
+    fmt_ctx = nullptr;
+    avformat_alloc_output_context2(&fmt_ctx, nullptr, "rtsp", rtsp_url);
+    if (!fmt_ctx) {
+        throw std::runtime_error("Failed to create output format context.");
+    }
+
     const AVCodec *codec = avcodec_find_encoder(AV_CODEC_ID_H264);
     if (!codec) {
         throw std::runtime_error("Codec not found");
     }
 
-    // 코덱 컨텍스트 할당
-    codec_ctx = avcodec_alloc_context3(codec);
-    if (!codec_ctx) {
-        throw std::runtime_error("Could not allocate codec context");
+    std::cout<<"test002"<<std::endl;
+    // 2. H.264 비디오 스트림 생성
+    video_stream = avformat_new_stream(fmt_ctx, nullptr);
+    if (!video_stream) {
+        avformat_free_context(fmt_ctx);
+        throw std::runtime_error("Failed to create video stream.");
     }
 
+
+    std::cout<<"test003"<<std::endl;
     // 초당 처리되는 비트 양 설정(400,000 bits per second = 400kbps)
+    // 코덱 컨텍스트 할당
+    //codec_ctx = avcodec_alloc_context3(codec);
+    // 수정된 코드
+    codec_ctx = video_stream->codec;
+    codec_ctx->codec_id = AV_CODEC_ID_H264;
+    codec_ctx->codec_type = AVMEDIA_TYPE_VIDEO;
     codec_ctx->bit_rate = 400000;                  // 비트레이트
     codec_ctx->width = WIDTH_RESIZE;               // 인코딩할 이미지의 가로 해상도
     codec_ctx->height = HEIGHT_RESIZE;             // 인코딩할 이미지의 세로 해상도
@@ -61,30 +85,53 @@ void Camera::initFFmpeg(const char *filename) {
     // I프레임과 P/B프레임간의 간격 설정 (GOP:Group of Pictures)
     // I프레임은 전체화면저장하는 완전한 프레임이고, P/B프레임은 이전 또는 다음프레임에 의존하는 차이프레임
     // gop_size = 10은 매 10프레임마다 I프레임을 삽입하는것
-    codec_ctx->max_b_frames = 1;                   // 최대 B-프레임
+   codec_ctx->max_b_frames = 1;                   // 최대 B-프레임
     codec_ctx->pix_fmt = AV_PIX_FMT_YUV420P;       // 출력 포맷
+                                                   //
+    std::cout<<"test004"<<std::endl;
+    // 3. 네트워크 초기화
+//    av_opt_set(fmt_ctx->priv_data, "rtsp_transport", "udp", 0); // RTSP TCP 설정
+//    if (avio_open(&fmt_ctx->pb, rtsp_url, AVIO_FLAG_WRITE) < 0) {
+//        avformat_free_context(fmt_ctx);
+//        throw std::runtime_error("Failed to open RTSP output.");
+//    }
+
+    std::cout<<"test004-1"<<std::endl;
 
     // 코덱 열고 초기화
-    if (avcodec_open2(codec_ctx, codec, NULL) < 0) {
-        throw std::runtime_error("Could not open codec");
-    }
+//    if (avcodec_open2(codec_ctx, codec, NULL) < 0) {
+//        throw std::runtime_error("Could not open codec");
+//    }
 
     // ffmpeg에서 사용할 포멧 컨텍스트 할당
-    fmt_ctx = avformat_alloc_context();
-    if (!fmt_ctx) {
-        throw std::runtime_error("Could not allocate format context");
-    }
+//    fmt_ctx = avformat_alloc_context();
+//    if (!fmt_ctx) {
+//        throw std::runtime_error("Could not allocate format context");
+//    }
 
     // 출력 파일 포멧 결정(파일이름에 따라 추측)
-    AVOutputFormat *output_fmt = av_guess_format(NULL, filename, NULL);
-    fmt_ctx->oformat = output_fmt;
+//    AVOutputFormat *output_fmt = av_guess_format(NULL, filename, NULL);
+//    fmt_ctx->oformat = output_fmt;
 
+ // 4. 스트림 헤더 작성
+    if (avformat_write_header(fmt_ctx, nullptr) < 0) {
+        avio_closep(&fmt_ctx->pb);
+        avformat_free_context(fmt_ctx);
+        throw std::runtime_error("Failed to write stream header.");
+    }
+
+    std::cout << "RTSP stream is ready at: " << rtsp_url << "\n";
+
+
+
+
+    std::cout<<"test005"<<std::endl;
     //avio_open으로 파일 열기. 쓰기모드로 염
     //파일입출력을위한 I/O핸들러를 여는 함수. 주어진 파일을 쓰기모드로 열고, FFmpeg이 해당파일에 데이터 쓸 수 있게함
     // AVFormatContext구조체의 pb필드는 입출력 핸들임
-    if (avio_open(&fmt_ctx->pb, filename, AVIO_FLAG_WRITE) < 0) {
-        throw std::runtime_error("Could not open output file");
-    }
+//    if (avio_open(&fmt_ctx->pb, filename, AVIO_FLAG_WRITE) < 0) {
+//        throw std::runtime_error("Could not open output file");
+//    }
 
     // ffmpeg라이브러리로 새 비디오 스트림 만들고 스트림 다양한 속성 설정 후 avformat_write_header로 파일헤더작성
     // 새 비디오 스트림 생성(avformat_new_stream함수는 AVFormatContext(fmt_ctx)에 새로운 AVStream (오디오 등등..)추가)
@@ -97,6 +144,7 @@ void Camera::initFFmpeg(const char *filename) {
     stream->codecpar->height = HEIGHT_RESIZE;
     stream->codecpar->format = AV_PIX_FMT_YUV420P;
 
+    std::cout<<"test005-1"<<std::endl;
     // 비디오 파일 헤더 작성
     int ret = avformat_write_header(fmt_ctx, NULL);
     if (ret < 0) {
@@ -104,6 +152,9 @@ void Camera::initFFmpeg(const char *filename) {
       av_strerror(ret, err_buf, sizeof(err_buf)); // 에러 메시지 변환
       throw std::runtime_error(std::string("Error writing header: ") + err_buf);
     }
+
+
+    std::cout<<"test006"<<std::endl;
 
     packet = av_packet_alloc();                    // 패킷 메모리 할당
     if (!packet) {
@@ -988,17 +1039,26 @@ void Camera::encodeFrame(const cv::Mat& cpuYUV420p, size_t size) {
             throw std::runtime_error("Error during encoding");
         }
 
-        if (packet->size > 0 && packet->data) {
+//        if (packet->size > 0 && packet->data) {
             //VideoCapture::getInstance().pushImg(packet->data, packet->size);
-            VideoCapture::getInstance().pushImg(packet);
-        }
+//            VideoCapture::getInstance().pushImg(packet);
+//        }
+
+//        if (av_interleaved_write_frame(fmt_ctx, packet) < 0) {
+//            std::cerr << "Failed to send packet to RTSP stream.\n";
+//            break;
+//        }
+//        av_packet_unref(packet); // 패킷 메모리 해제
+
+        // FPS 조정을 위해 대기
+//        av_usleep(40000); // 25 FPS 기준 40ms
 
         //인코딩된 패킷을 출력파일에 기록한 후 패킷을 해제함(unref)
         // av_interleaved_write_fraem 은 인코딩된 패킷을 출력파일에 기록하는 함수
         // 인터리빙 방식 : 오디오 및 비디오 스트림 교차저장하는 방식(영상재생시 동시에 재생되게함)
         // fmt_ctx(포맷컨텍스트) 출력파일과 관련된 정보 포함하고있으며, 파일에 패킷을 기록할 대상이 됨
         // pkt : 인코딩된 비디오또는 오디오 데이터 포함하고있음. 이 데이터를 출력파일에 기록하는것
- //     av_interleaved_write_frame(fmt_ctx, packet);      // 패킷을 파일에 기록
+//        av_interleaved_write_frame(fmt_ctx, packet);      // 패킷을 파일에 기록
         // 패킷에 할당된 메모리를 해제. 인코딩된 데이터를 파일에 기록한 후 메모리 해제해야함
     //  av_packet_unref(packet);
 
