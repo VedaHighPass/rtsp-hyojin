@@ -182,7 +182,7 @@ void Camera::initDevice() {
 void Camera::initMMap() {
     struct v4l2_requestbuffers req{};
     memset(&req, 0, sizeof(req));  /* req 구조체의 모든 필드를 0으로 초기화 */
-    req.count = 8;
+    req.count = 4;
     req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     req.memory = V4L2_MEMORY_MMAP;
 
@@ -1204,7 +1204,6 @@ void Camera::processRawImageCUDA(void* data, int width, int height) {
 
 bool Camera::captureOpencv(Camera& camera) {
 
-    auto start = std::chrono::high_resolution_clock::now();
 
     struct v4l2_buffer buf{};
     buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -1242,13 +1241,6 @@ bool Camera::captureOpencv(Camera& camera) {
     if (ioctl(fd, VIDIOC_QBUF, &buf) == -1) {
         throw std::runtime_error("Failed to queue buffer");
     }
-
-    auto end = std::chrono::high_resolution_clock::now();
-
-    // 실행 시간 계산 (밀리초 단위)
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    std::cout << "captureOpencv() 실행 시간: " << duration << " ms" << std::endl;
-
 
     return true;
 }

@@ -32,7 +32,10 @@ int main() {
 //
         // camera.checkFormat();
         for (int i = 0; i < 50000; ++i) {
+            auto start = std::chrono::high_resolution_clock::now();
+
             for (;;) {  /* 내부 무한 루프: 성공적으로 프레임을 읽을 때까지 반복 */
+
                 fd_set fds;  /* 파일 디스크립터 셋을 선언: select()로 이벤트를 감시할 파일 디스크립터 */
                 struct timeval tv;  /* 타임아웃을 설정하기 위한 구조체 */
 //
@@ -58,6 +61,12 @@ int main() {
 //
                 if (camera.captureOpencv(camera)) break;
             }
+
+            auto end = std::chrono::high_resolution_clock::now();
+                // 실행 시간 계산 (밀리초 단위)
+            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+            std::cout << "captureOpencv() 실행 시간: " << duration << " ms" << std::endl;
+
         }
 
     } catch (const std::exception& e) {
