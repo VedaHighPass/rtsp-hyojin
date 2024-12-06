@@ -25,7 +25,10 @@ public:
 
     void SetCmd(const std::string& cmd);
 
+    void Exit();
+
 private:
+    bool threadRun=true;
     MediaStreamState streamState;
     std::mutex streamMutex;
     std::condition_variable condition; // condition variable for streaming state controll

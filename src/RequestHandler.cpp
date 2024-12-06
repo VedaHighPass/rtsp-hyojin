@@ -46,6 +46,8 @@ void RequestHandler::HandleRequest() {
             HandlePauseRequest(cseq);
         } else if (method == "TEARDOWN") {
             HandleTeardownRequest(cseq);
+            std::cout << "client Session Closed";
+            break;
         } else {
             std::cerr << "Unsupported RTSP method: " << method << std::endl;
         }
@@ -216,4 +218,5 @@ void RequestHandler::HandleTeardownRequest(int cseq) {
     TCPHandler::GetInstance().SendRTSPResponse(client->tcpSocket, response);
 
     mediaStreamHandler->SetCmd("TEARDOWN");
+    mediaStreamHandler->Exit(); //thread exit wait
 }

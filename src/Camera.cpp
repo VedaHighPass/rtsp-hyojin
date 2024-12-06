@@ -56,8 +56,10 @@ void Camera::initFFmpeg(const char *filename) {
     codec_ctx->bit_rate = 400000;                  // 비트레이트
     codec_ctx->width = WIDTH_RESIZE;               // 인코딩할 이미지의 가로 해상도
     codec_ctx->height = HEIGHT_RESIZE;             // 인코딩할 이미지의 세로 해상도
-    codec_ctx->time_base = {1, 25};                // 25fps 설정(1/25)
+//     codec_ctx->time_base = {1, 25};                // 25fps 설정(1/25)
+    codec_ctx->time_base = {1,10};                 // 10fps 설정(1000ms/100ms)
     codec_ctx->gop_size = 10;                      // GOP 크기 (10프레임마다 I-프레임)
+
     // I프레임과 P/B프레임간의 간격 설정 (GOP:Group of Pictures)
     // I프레임은 전체화면저장하는 완전한 프레임이고, P/B프레임은 이전 또는 다음프레임에 의존하는 차이프레임
     // gop_size = 10은 매 10프레임마다 I프레임을 삽입하는것
@@ -971,7 +973,8 @@ void Camera::encodeFrame(const cv::Mat& cpuYUV420p, size_t size) {
 
     // PTS 설정 (프레임 인덱스를 사용하여 PTS 설정)
     // PTS는 각 프레임이 언제 표시되어야하는지를 나타내는 시간정보. 여기서 frame_index는 인코딩중인 프레임 순서 의미
-    frame->pts = frame_index++;                           // 프레임 PTS 설정
+//     frame->pts = frame_index++;                           // 프레임 PTS 설정
+    frame->pts = frame_index++ * (codec_ctx->time_base.den / codec_ctx->time_base.num / 8);
 
     // 프레임을 인코더로 보냄
     int ret = avcodec_send_frame(codec_ctx, frame);

@@ -50,7 +50,7 @@ std::pair<int, std::string> TCPHandler::AcceptClientConnection() {
 
     char clientIP[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &tcpAddr.sin_addr, clientIP, INET_ADDRSTRLEN);
-    
+
     return { clientSocket, clientIP };
 }
 
