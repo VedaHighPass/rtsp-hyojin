@@ -120,7 +120,7 @@ void MediaStreamHandler::HandleMediaStream()
                 // 주기적으로 RTCP Sender Report 전송
                 packetCount++;
                 octetCount += cur_frame_size;
-                timestamp += 555;
+                timestamp += 1000;
                 //delete (ptr_cur_frame);
                 //av_packet_unref(cur_frame); //memory 할당 해제
             }
