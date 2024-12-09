@@ -4502,13 +4502,9 @@ CMakeFiles/app.dir/src/main.cpp.o: ../src/main.cpp \
   /usr/include/aarch64-linux-gnu/libavutil/pixdesc.h \
   /usr/include/aarch64-linux-gnu/libavutil/opt.h \
   /usr/include/aarch64-linux-gnu/libavutil/time.h \
-  ../inc/FrameBuffer.h \
+  ../inc/CUDAimageprocessing.h \
   ../inc/common.h \
-  ../inc/Camera.h \
-  ../inc/FrameBuffer.h \
-  ../inc/CUDAimageprocessing.h \
   ../inc/VideoCapture.h \
-  ../inc/CUDAimageprocessing.h \
   ../inc/ClientSession.h \
   ../inc/TCPHandler.h \
   /usr/include/arpa/inet.h \
