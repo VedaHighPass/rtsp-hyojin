@@ -539,8 +539,10 @@ CMakeFiles/app.dir/src/main.cpp.o: \
  /usr/include/aarch64-linux-gnu/libavutil/time.h \
  /mnt/ssd/projects/HighPass/test/test_orin_rtsp/inc/CUDAimageprocessing.h \
  /mnt/ssd/projects/HighPass/test/test_orin_rtsp/inc/common.h \
+ /mnt/ssd/projects/HighPass/test/test_orin_rtsp/inc/GStreamerCapture.h \
+ /mnt/ssd/projects/HighPass/test/test_orin_rtsp/inc/FFmpegEncoder.h \
  /mnt/ssd/projects/HighPass/test/test_orin_rtsp/inc/VideoCapture.h \
- /mnt/ssd/projects/HighPass/test/test_orin_rtsp/inc/ClientSession.h \
+ /mnt/ssd/projects/HighPass/test/test_orin_rtsp/inc/RTSPServer.h \
  /mnt/ssd/projects/HighPass/test/test_orin_rtsp/inc/TCPHandler.h \
  /usr/include/arpa/inet.h /usr/include/netinet/in.h \
  /usr/include/aarch64-linux-gnu/sys/socket.h \

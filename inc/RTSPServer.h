@@ -8,12 +8,14 @@ class RTSPServer {
 public:
     RTSPServer();
     ~RTSPServer();
+
     void start();
+    void stop();
 
 private:
     void clientHandler();
     std::thread serverThread;
-    bool stopFlag = false;
+    bool stopFlag;
 };
 
 #endif // RTSP_SERVER_H

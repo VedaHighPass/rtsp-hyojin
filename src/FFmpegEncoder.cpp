@@ -24,7 +24,6 @@ void FFmpegEncoder::initFFmpeg(const std::string& filename, double fps) {
     codec_ctx->width = width;
     codec_ctx->height = height;
     codec_ctx->time_base = (AVRational){1, static_cast<int>(fps)};
-    codec_ctx->framerate = (AVRational){static_cast<int>(fps), 1};
     codec_ctx->gop_size = 30;
     codec_ctx->max_b_frames = 1;
     codec_ctx->pix_fmt = AV_PIX_FMT_YUV420P;
@@ -59,7 +58,11 @@ void FFmpegEncoder::initFFmpeg(const std::string& filename, double fps) {
     }
 
     stream->time_base = codec_ctx->time_base;
-    avcodec_parameters_from_context(stream->codecpar, codec_ctx);
+    stream->codecpar->codec_id = AV_CODEC_ID_H264; // H.264 코덱 설정
+    stream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO; // 미디어 타입 비디오로 설정(오디오도 있음)
+    stream->codecpar->width = codec_ctx->width;
+    stream->codecpar->height = codec_ctx->height;
+    stream->codecpar->format = AV_PIX_FMT_YUV420P;
 
     if (avformat_write_header(fmt_ctx, NULL) < 0) {
         throw std::runtime_error("Error writing header");
