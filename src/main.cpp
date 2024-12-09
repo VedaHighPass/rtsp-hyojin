@@ -24,12 +24,12 @@ void initFFmpeg(const char *filename, double fps) {
     }
 
     // 초당 처리되는 비트 양 설정(4,000,000 bits per second = 4000kbps)
-    codec_ctx->bit_rate = 6000000;                  // 비트레이트
+    codec_ctx->bit_rate = 4000000;                  // 비트레이트
     codec_ctx->width = WIDTH_RESIZE;               // 인코딩할 이미지의 가로 해상도
     codec_ctx->height = HEIGHT_RESIZE;             // 인코딩할 이미지의 세로 해상도
-//     codec_ctx->time_base = (AVRational){1, 15}; // FPS = 10 (1/10초마다 프레임 생성)
+    codec_ctx->time_base = (AVRational){1, 30}; // FPS = 10 (1/10초마다 프레임 생성)
     // 실제 FPS 기반으로 time_base 설정
-    codec_ctx->time_base = AVRational{1, static_cast<int>(fps)};
+//     codec_ctx->time_base = AVRational{1, static_cast<int>(fps)};
     codec_ctx->gop_size = 30;                      // GOP 크기 (10프레임마다 I-프레임)
 
     // I프레임과 P/B프레임간의 간격 설정 (GOP:Group of Pictures)
@@ -37,6 +37,14 @@ void initFFmpeg(const char *filename, double fps) {
     // gop_size = 10은 매 10프레임마다 I프레임을 삽입하는것
     codec_ctx->max_b_frames = 1;                   // 최대 B-프레임
     codec_ctx->pix_fmt = AV_PIX_FMT_YUV420P;       // 출력 포맷
+
+    // 멀티스레드 활성화
+    codec_ctx->thread_count = 4;
+    codec_ctx->thread_type = FF_THREAD_FRAME;
+
+    // 속도 우선 옵션
+    av_opt_set(codec_ctx->priv_data, "preset", "ultrafast", 0);
+    av_opt_set(codec_ctx->priv_data, "tune", "zerolatency", 0);
 
     // 코덱 열고 초기화
     if (avcodec_open2(codec_ctx, codec, NULL) < 0) {
@@ -108,10 +116,9 @@ void encodeFrame(const cv::Mat& cpuYUV420p, double measuredFPS) {
     int y_size = codec_ctx->width * codec_ctx->height;      // Y 채널 크기
     int uv_size = y_size / 4;                              // U 및 V 채널 크기
 
-    // Y, U, V 채널 데이터를 AVFrame에 복사
-    memcpy(frame->data[0], cpuYUV420p.data, y_size);               // Y 채널
-    memcpy(frame->data[1], cpuYUV420p.data + y_size, uv_size);     // U 채널
-    memcpy(frame->data[2], cpuYUV420p.data + y_size + uv_size, uv_size); // V 채널
+    frame->data[0] = cpuYUV420p.data;                      // Y 채널
+    frame->data[1] = cpuYUV420p.data + y_size;            // U 채널
+    frame->data[2] = cpuYUV420p.data + y_size + uv_size;  // V 채널
 
 
     // PTS 설정 (프레임 인덱스를 사용하여 PTS 설정)
@@ -181,7 +188,7 @@ void releaseFFmpeg() {
 int main() {
 
     // Replace with the correct GStreamer pipeline for your IMX219 camera
-    const char *pipeline_str = "nvarguscamerasrc ! video/x-raw(memory:NVMM),width=1920,height=1080,framerate=30/1 ! nvvidconv ! videoconvert ! video/x-raw, format=(string)BGR ! appsink";
+    const char *pipeline_str = "nvarguscamerasrc ! video/x-raw(memory:NVMM),width=1920,height=1080 ! nvvidconv ! videoconvert ! video/x-raw, format=(string)BGR ! appsink";
     cv::VideoCapture cap(pipeline_str, cv::CAP_GSTREAMER);
     if (!cap.isOpened()) {
         std::cerr << "Error: Unable to open the GStreamer pipeline." << std::endl;
@@ -203,7 +210,7 @@ int main() {
         .detach();
 
     int frameCount = 0;
-    double fps = 15.0; // 초기 FPS 가정값
+    double fps = 30.0; // 초기 FPS 가정값
     double accumulatedFPS = 0.0;
     int fpsMeasurements = 0;
     auto start = std::chrono::high_resolution_clock::now();

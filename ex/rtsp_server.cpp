@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
     // Define the GStreamer pipeline for streaming
     gst_rtsp_media_factory_set_launch(factory,
         "( nvarguscamerasrc ! "
-        "video/x-raw(memory:NVMM),width=1280,height=720,framerate=30/1 ! "
+        "video/x-raw(memory:NVMM),width=1920,height=1080 ! "
         "nvvidconv ! video/x-raw,format=I420 ! "
         "x264enc tune=zerolatency bitrate=5000 speed-preset=ultrafast ! "
         "rtph264pay name=pay0 pt=96 )");
