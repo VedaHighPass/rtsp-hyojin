@@ -39,7 +39,8 @@ void initFFmpeg(const char *filename, double fps) {
     codec_ctx->pix_fmt = AV_PIX_FMT_YUV420P;       // 출력 포맷
 
     // 멀티스레드 활성화
-    codec_ctx->thread_count = 4;
+    //codec_ctx->thread_count = 4;
+    codec_ctx->thread_count = std::thread::hardware_concurrency();
     codec_ctx->thread_type = FF_THREAD_FRAME;
 
     // 속도 우선 옵션
@@ -188,7 +189,10 @@ void releaseFFmpeg() {
 int main() {
 
     // Replace with the correct GStreamer pipeline for your IMX219 camera
-    const char *pipeline_str = "nvarguscamerasrc ! video/x-raw(memory:NVMM),width=1920,height=1080 ! nvvidconv ! videoconvert ! video/x-raw, format=(string)BGR ! appsink";
+    //const char *pipeline_str = "nvarguscamerasrc ! video/x-raw(memory:NVMM),width=1920,height=1080 ! nvvidconv ! videoconvert ! video/x-raw, format=(string)BGR ! appsink";
+
+    const char *pipeline_str = "nvarguscamerasrc sensor-id=0 ! video/x-raw(memory:NVMM),width=1920,height=1080,framerate=21/1,format=NV12 ! nvvidconv ! video/x-raw,format=BGRx ! videoconvert ! video/x-raw,format=BGR ! appsink";
+
     cv::VideoCapture cap(pipeline_str, cv::CAP_GSTREAMER);
     if (!cap.isOpened()) {
         std::cerr << "Error: Unable to open the GStreamer pipeline." << std::endl;
@@ -276,8 +280,9 @@ int main() {
         std::cerr << "Error: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
-//
+
     return EXIT_SUCCESS;
 }
+
 
 

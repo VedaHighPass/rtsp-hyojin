@@ -97,10 +97,24 @@ CMakeFiles/app.dir/src/ClientSession.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/app.dir/src/ClientSession.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/ClientSession.cpp -o CMakeFiles/app.dir/src/ClientSession.cpp.s
 
+CMakeFiles/app.dir/src/FFmpegEncoder.cpp.o: CMakeFiles/app.dir/flags.make
+CMakeFiles/app.dir/src/FFmpegEncoder.cpp.o: ../src/FFmpegEncoder.cpp
+CMakeFiles/app.dir/src/FFmpegEncoder.cpp.o: CMakeFiles/app.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/app.dir/src/FFmpegEncoder.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/FFmpegEncoder.cpp.o -MF CMakeFiles/app.dir/src/FFmpegEncoder.cpp.o.d -o CMakeFiles/app.dir/src/FFmpegEncoder.cpp.o -c /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/FFmpegEncoder.cpp
+
+CMakeFiles/app.dir/src/FFmpegEncoder.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/app.dir/src/FFmpegEncoder.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/FFmpegEncoder.cpp > CMakeFiles/app.dir/src/FFmpegEncoder.cpp.i
+
+CMakeFiles/app.dir/src/FFmpegEncoder.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/app.dir/src/FFmpegEncoder.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/FFmpegEncoder.cpp -o CMakeFiles/app.dir/src/FFmpegEncoder.cpp.s
+
 CMakeFiles/app.dir/src/FrameBuffer.cpp.o: CMakeFiles/app.dir/flags.make
 CMakeFiles/app.dir/src/FrameBuffer.cpp.o: ../src/FrameBuffer.cpp
 CMakeFiles/app.dir/src/FrameBuffer.cpp.o: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/app.dir/src/FrameBuffer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/app.dir/src/FrameBuffer.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/FrameBuffer.cpp.o -MF CMakeFiles/app.dir/src/FrameBuffer.cpp.o.d -o CMakeFiles/app.dir/src/FrameBuffer.cpp.o -c /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/FrameBuffer.cpp
 
 CMakeFiles/app.dir/src/FrameBuffer.cpp.i: cmake_force
@@ -111,10 +125,24 @@ CMakeFiles/app.dir/src/FrameBuffer.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/app.dir/src/FrameBuffer.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/FrameBuffer.cpp -o CMakeFiles/app.dir/src/FrameBuffer.cpp.s
 
+CMakeFiles/app.dir/src/GStreamerCapture.cpp.o: CMakeFiles/app.dir/flags.make
+CMakeFiles/app.dir/src/GStreamerCapture.cpp.o: ../src/GStreamerCapture.cpp
+CMakeFiles/app.dir/src/GStreamerCapture.cpp.o: CMakeFiles/app.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/app.dir/src/GStreamerCapture.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/GStreamerCapture.cpp.o -MF CMakeFiles/app.dir/src/GStreamerCapture.cpp.o.d -o CMakeFiles/app.dir/src/GStreamerCapture.cpp.o -c /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/GStreamerCapture.cpp
+
+CMakeFiles/app.dir/src/GStreamerCapture.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/app.dir/src/GStreamerCapture.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/GStreamerCapture.cpp > CMakeFiles/app.dir/src/GStreamerCapture.cpp.i
+
+CMakeFiles/app.dir/src/GStreamerCapture.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/app.dir/src/GStreamerCapture.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/GStreamerCapture.cpp -o CMakeFiles/app.dir/src/GStreamerCapture.cpp.s
+
 CMakeFiles/app.dir/src/H264Encoder.cpp.o: CMakeFiles/app.dir/flags.make
 CMakeFiles/app.dir/src/H264Encoder.cpp.o: ../src/H264Encoder.cpp
 CMakeFiles/app.dir/src/H264Encoder.cpp.o: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/app.dir/src/H264Encoder.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/app.dir/src/H264Encoder.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/H264Encoder.cpp.o -MF CMakeFiles/app.dir/src/H264Encoder.cpp.o.d -o CMakeFiles/app.dir/src/H264Encoder.cpp.o -c /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/H264Encoder.cpp
 
 CMakeFiles/app.dir/src/H264Encoder.cpp.i: cmake_force
@@ -128,7 +156,7 @@ CMakeFiles/app.dir/src/H264Encoder.cpp.s: cmake_force
 CMakeFiles/app.dir/src/MediaStreamHandler.cpp.o: CMakeFiles/app.dir/flags.make
 CMakeFiles/app.dir/src/MediaStreamHandler.cpp.o: ../src/MediaStreamHandler.cpp
 CMakeFiles/app.dir/src/MediaStreamHandler.cpp.o: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/app.dir/src/MediaStreamHandler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/app.dir/src/MediaStreamHandler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/MediaStreamHandler.cpp.o -MF CMakeFiles/app.dir/src/MediaStreamHandler.cpp.o.d -o CMakeFiles/app.dir/src/MediaStreamHandler.cpp.o -c /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/MediaStreamHandler.cpp
 
 CMakeFiles/app.dir/src/MediaStreamHandler.cpp.i: cmake_force
@@ -139,10 +167,24 @@ CMakeFiles/app.dir/src/MediaStreamHandler.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/app.dir/src/MediaStreamHandler.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/MediaStreamHandler.cpp -o CMakeFiles/app.dir/src/MediaStreamHandler.cpp.s
 
+CMakeFiles/app.dir/src/RTSPServer.cpp.o: CMakeFiles/app.dir/flags.make
+CMakeFiles/app.dir/src/RTSPServer.cpp.o: ../src/RTSPServer.cpp
+CMakeFiles/app.dir/src/RTSPServer.cpp.o: CMakeFiles/app.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/app.dir/src/RTSPServer.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/RTSPServer.cpp.o -MF CMakeFiles/app.dir/src/RTSPServer.cpp.o.d -o CMakeFiles/app.dir/src/RTSPServer.cpp.o -c /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/RTSPServer.cpp
+
+CMakeFiles/app.dir/src/RTSPServer.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/app.dir/src/RTSPServer.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/RTSPServer.cpp > CMakeFiles/app.dir/src/RTSPServer.cpp.i
+
+CMakeFiles/app.dir/src/RTSPServer.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/app.dir/src/RTSPServer.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/RTSPServer.cpp -o CMakeFiles/app.dir/src/RTSPServer.cpp.s
+
 CMakeFiles/app.dir/src/RequestHandler.cpp.o: CMakeFiles/app.dir/flags.make
 CMakeFiles/app.dir/src/RequestHandler.cpp.o: ../src/RequestHandler.cpp
 CMakeFiles/app.dir/src/RequestHandler.cpp.o: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/app.dir/src/RequestHandler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/app.dir/src/RequestHandler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/RequestHandler.cpp.o -MF CMakeFiles/app.dir/src/RequestHandler.cpp.o.d -o CMakeFiles/app.dir/src/RequestHandler.cpp.o -c /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/RequestHandler.cpp
 
 CMakeFiles/app.dir/src/RequestHandler.cpp.i: cmake_force
@@ -156,7 +198,7 @@ CMakeFiles/app.dir/src/RequestHandler.cpp.s: cmake_force
 CMakeFiles/app.dir/src/TCPHandler.cpp.o: CMakeFiles/app.dir/flags.make
 CMakeFiles/app.dir/src/TCPHandler.cpp.o: ../src/TCPHandler.cpp
 CMakeFiles/app.dir/src/TCPHandler.cpp.o: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/app.dir/src/TCPHandler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/app.dir/src/TCPHandler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/TCPHandler.cpp.o -MF CMakeFiles/app.dir/src/TCPHandler.cpp.o.d -o CMakeFiles/app.dir/src/TCPHandler.cpp.o -c /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/TCPHandler.cpp
 
 CMakeFiles/app.dir/src/TCPHandler.cpp.i: cmake_force
@@ -170,7 +212,7 @@ CMakeFiles/app.dir/src/TCPHandler.cpp.s: cmake_force
 CMakeFiles/app.dir/src/UDPHandler.cpp.o: CMakeFiles/app.dir/flags.make
 CMakeFiles/app.dir/src/UDPHandler.cpp.o: ../src/UDPHandler.cpp
 CMakeFiles/app.dir/src/UDPHandler.cpp.o: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/app.dir/src/UDPHandler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/app.dir/src/UDPHandler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/UDPHandler.cpp.o -MF CMakeFiles/app.dir/src/UDPHandler.cpp.o.d -o CMakeFiles/app.dir/src/UDPHandler.cpp.o -c /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/UDPHandler.cpp
 
 CMakeFiles/app.dir/src/UDPHandler.cpp.i: cmake_force
@@ -184,7 +226,7 @@ CMakeFiles/app.dir/src/UDPHandler.cpp.s: cmake_force
 CMakeFiles/app.dir/src/VideoCapture.cpp.o: CMakeFiles/app.dir/flags.make
 CMakeFiles/app.dir/src/VideoCapture.cpp.o: ../src/VideoCapture.cpp
 CMakeFiles/app.dir/src/VideoCapture.cpp.o: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/app.dir/src/VideoCapture.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/app.dir/src/VideoCapture.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/VideoCapture.cpp.o -MF CMakeFiles/app.dir/src/VideoCapture.cpp.o.d -o CMakeFiles/app.dir/src/VideoCapture.cpp.o -c /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/VideoCapture.cpp
 
 CMakeFiles/app.dir/src/VideoCapture.cpp.i: cmake_force
@@ -198,7 +240,7 @@ CMakeFiles/app.dir/src/VideoCapture.cpp.s: cmake_force
 CMakeFiles/app.dir/src/main.cpp.o: CMakeFiles/app.dir/flags.make
 CMakeFiles/app.dir/src/main.cpp.o: ../src/main.cpp
 CMakeFiles/app.dir/src/main.cpp.o: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/app.dir/src/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/app.dir/src/main.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/main.cpp.o -MF CMakeFiles/app.dir/src/main.cpp.o.d -o CMakeFiles/app.dir/src/main.cpp.o -c /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/main.cpp
 
 CMakeFiles/app.dir/src/main.cpp.i: cmake_force
@@ -212,7 +254,7 @@ CMakeFiles/app.dir/src/main.cpp.s: cmake_force
 CMakeFiles/app.dir/src/rtp_header.cpp.o: CMakeFiles/app.dir/flags.make
 CMakeFiles/app.dir/src/rtp_header.cpp.o: ../src/rtp_header.cpp
 CMakeFiles/app.dir/src/rtp_header.cpp.o: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/app.dir/src/rtp_header.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/app.dir/src/rtp_header.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/rtp_header.cpp.o -MF CMakeFiles/app.dir/src/rtp_header.cpp.o.d -o CMakeFiles/app.dir/src/rtp_header.cpp.o -c /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/rtp_header.cpp
 
 CMakeFiles/app.dir/src/rtp_header.cpp.i: cmake_force
@@ -226,7 +268,7 @@ CMakeFiles/app.dir/src/rtp_header.cpp.s: cmake_force
 CMakeFiles/app.dir/src/rtp_packet.cpp.o: CMakeFiles/app.dir/flags.make
 CMakeFiles/app.dir/src/rtp_packet.cpp.o: ../src/rtp_packet.cpp
 CMakeFiles/app.dir/src/rtp_packet.cpp.o: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/app.dir/src/rtp_packet.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/app.dir/src/rtp_packet.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/rtp_packet.cpp.o -MF CMakeFiles/app.dir/src/rtp_packet.cpp.o.d -o CMakeFiles/app.dir/src/rtp_packet.cpp.o -c /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/rtp_packet.cpp
 
 CMakeFiles/app.dir/src/rtp_packet.cpp.i: cmake_force
@@ -240,7 +282,7 @@ CMakeFiles/app.dir/src/rtp_packet.cpp.s: cmake_force
 CMakeFiles/app.dir/src/utils.cpp.o: CMakeFiles/app.dir/flags.make
 CMakeFiles/app.dir/src/utils.cpp.o: ../src/utils.cpp
 CMakeFiles/app.dir/src/utils.cpp.o: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/app.dir/src/utils.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/app.dir/src/utils.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/utils.cpp.o -MF CMakeFiles/app.dir/src/utils.cpp.o.d -o CMakeFiles/app.dir/src/utils.cpp.o -c /mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/utils.cpp
 
 CMakeFiles/app.dir/src/utils.cpp.i: cmake_force
@@ -255,9 +297,12 @@ CMakeFiles/app.dir/src/utils.cpp.s: cmake_force
 app_OBJECTS = \
 "CMakeFiles/app.dir/src/Camera.cpp.o" \
 "CMakeFiles/app.dir/src/ClientSession.cpp.o" \
+"CMakeFiles/app.dir/src/FFmpegEncoder.cpp.o" \
 "CMakeFiles/app.dir/src/FrameBuffer.cpp.o" \
+"CMakeFiles/app.dir/src/GStreamerCapture.cpp.o" \
 "CMakeFiles/app.dir/src/H264Encoder.cpp.o" \
 "CMakeFiles/app.dir/src/MediaStreamHandler.cpp.o" \
+"CMakeFiles/app.dir/src/RTSPServer.cpp.o" \
 "CMakeFiles/app.dir/src/RequestHandler.cpp.o" \
 "CMakeFiles/app.dir/src/TCPHandler.cpp.o" \
 "CMakeFiles/app.dir/src/UDPHandler.cpp.o" \
@@ -272,9 +317,12 @@ app_EXTERNAL_OBJECTS =
 
 app: CMakeFiles/app.dir/src/Camera.cpp.o
 app: CMakeFiles/app.dir/src/ClientSession.cpp.o
+app: CMakeFiles/app.dir/src/FFmpegEncoder.cpp.o
 app: CMakeFiles/app.dir/src/FrameBuffer.cpp.o
+app: CMakeFiles/app.dir/src/GStreamerCapture.cpp.o
 app: CMakeFiles/app.dir/src/H264Encoder.cpp.o
 app: CMakeFiles/app.dir/src/MediaStreamHandler.cpp.o
+app: CMakeFiles/app.dir/src/RTSPServer.cpp.o
 app: CMakeFiles/app.dir/src/RequestHandler.cpp.o
 app: CMakeFiles/app.dir/src/TCPHandler.cpp.o
 app: CMakeFiles/app.dir/src/UDPHandler.cpp.o
@@ -355,7 +403,7 @@ app: /usr/local/lib/libopencv_cudaarithm.so.4.10.0
 app: /usr/local/lib/libopencv_core.so.4.10.0
 app: /usr/local/lib/libopencv_cudev.so.4.10.0
 app: CMakeFiles/app.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Linking CXX executable app"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/ssd/projects/HighPass/test/test_orin_rtsp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Linking CXX executable app"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/app.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

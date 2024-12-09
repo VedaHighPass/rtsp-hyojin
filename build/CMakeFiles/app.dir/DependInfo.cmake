@@ -10,9 +10,12 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/Camera.cpp" "CMakeFiles/app.dir/src/Camera.cpp.o" "gcc" "CMakeFiles/app.dir/src/Camera.cpp.o.d"
   "/mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/ClientSession.cpp" "CMakeFiles/app.dir/src/ClientSession.cpp.o" "gcc" "CMakeFiles/app.dir/src/ClientSession.cpp.o.d"
+  "/mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/FFmpegEncoder.cpp" "CMakeFiles/app.dir/src/FFmpegEncoder.cpp.o" "gcc" "CMakeFiles/app.dir/src/FFmpegEncoder.cpp.o.d"
   "/mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/FrameBuffer.cpp" "CMakeFiles/app.dir/src/FrameBuffer.cpp.o" "gcc" "CMakeFiles/app.dir/src/FrameBuffer.cpp.o.d"
+  "/mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/GStreamerCapture.cpp" "CMakeFiles/app.dir/src/GStreamerCapture.cpp.o" "gcc" "CMakeFiles/app.dir/src/GStreamerCapture.cpp.o.d"
   "/mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/H264Encoder.cpp" "CMakeFiles/app.dir/src/H264Encoder.cpp.o" "gcc" "CMakeFiles/app.dir/src/H264Encoder.cpp.o.d"
   "/mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/MediaStreamHandler.cpp" "CMakeFiles/app.dir/src/MediaStreamHandler.cpp.o" "gcc" "CMakeFiles/app.dir/src/MediaStreamHandler.cpp.o.d"
+  "/mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/RTSPServer.cpp" "CMakeFiles/app.dir/src/RTSPServer.cpp.o" "gcc" "CMakeFiles/app.dir/src/RTSPServer.cpp.o.d"
   "/mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/RequestHandler.cpp" "CMakeFiles/app.dir/src/RequestHandler.cpp.o" "gcc" "CMakeFiles/app.dir/src/RequestHandler.cpp.o.d"
   "/mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/TCPHandler.cpp" "CMakeFiles/app.dir/src/TCPHandler.cpp.o" "gcc" "CMakeFiles/app.dir/src/TCPHandler.cpp.o.d"
   "/mnt/ssd/projects/HighPass/test/test_orin_rtsp/src/UDPHandler.cpp" "CMakeFiles/app.dir/src/UDPHandler.cpp.o" "gcc" "CMakeFiles/app.dir/src/UDPHandler.cpp.o.d"

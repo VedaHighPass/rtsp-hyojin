@@ -190,6 +190,30 @@ src/ClientSession.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/ClientSession.cpp.s
 .PHONY : src/ClientSession.cpp.s
 
+src/FFmpegEncoder.o: src/FFmpegEncoder.cpp.o
+.PHONY : src/FFmpegEncoder.o
+
+# target to build an object file
+src/FFmpegEncoder.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/FFmpegEncoder.cpp.o
+.PHONY : src/FFmpegEncoder.cpp.o
+
+src/FFmpegEncoder.i: src/FFmpegEncoder.cpp.i
+.PHONY : src/FFmpegEncoder.i
+
+# target to preprocess a source file
+src/FFmpegEncoder.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/FFmpegEncoder.cpp.i
+.PHONY : src/FFmpegEncoder.cpp.i
+
+src/FFmpegEncoder.s: src/FFmpegEncoder.cpp.s
+.PHONY : src/FFmpegEncoder.s
+
+# target to generate assembly for a file
+src/FFmpegEncoder.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/FFmpegEncoder.cpp.s
+.PHONY : src/FFmpegEncoder.cpp.s
+
 src/FrameBuffer.o: src/FrameBuffer.cpp.o
 .PHONY : src/FrameBuffer.o
 
@@ -213,6 +237,30 @@ src/FrameBuffer.s: src/FrameBuffer.cpp.s
 src/FrameBuffer.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/FrameBuffer.cpp.s
 .PHONY : src/FrameBuffer.cpp.s
+
+src/GStreamerCapture.o: src/GStreamerCapture.cpp.o
+.PHONY : src/GStreamerCapture.o
+
+# target to build an object file
+src/GStreamerCapture.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/GStreamerCapture.cpp.o
+.PHONY : src/GStreamerCapture.cpp.o
+
+src/GStreamerCapture.i: src/GStreamerCapture.cpp.i
+.PHONY : src/GStreamerCapture.i
+
+# target to preprocess a source file
+src/GStreamerCapture.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/GStreamerCapture.cpp.i
+.PHONY : src/GStreamerCapture.cpp.i
+
+src/GStreamerCapture.s: src/GStreamerCapture.cpp.s
+.PHONY : src/GStreamerCapture.s
+
+# target to generate assembly for a file
+src/GStreamerCapture.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/GStreamerCapture.cpp.s
+.PHONY : src/GStreamerCapture.cpp.s
 
 src/H264Encoder.o: src/H264Encoder.cpp.o
 .PHONY : src/H264Encoder.o
@@ -261,6 +309,30 @@ src/MediaStreamHandler.s: src/MediaStreamHandler.cpp.s
 src/MediaStreamHandler.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/MediaStreamHandler.cpp.s
 .PHONY : src/MediaStreamHandler.cpp.s
+
+src/RTSPServer.o: src/RTSPServer.cpp.o
+.PHONY : src/RTSPServer.o
+
+# target to build an object file
+src/RTSPServer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/RTSPServer.cpp.o
+.PHONY : src/RTSPServer.cpp.o
+
+src/RTSPServer.i: src/RTSPServer.cpp.i
+.PHONY : src/RTSPServer.i
+
+# target to preprocess a source file
+src/RTSPServer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/RTSPServer.cpp.i
+.PHONY : src/RTSPServer.cpp.i
+
+src/RTSPServer.s: src/RTSPServer.cpp.s
+.PHONY : src/RTSPServer.s
+
+# target to generate assembly for a file
+src/RTSPServer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/RTSPServer.cpp.s
+.PHONY : src/RTSPServer.cpp.s
 
 src/RequestHandler.o: src/RequestHandler.cpp.o
 .PHONY : src/RequestHandler.o
@@ -470,15 +542,24 @@ help:
 	@echo "... src/ClientSession.o"
 	@echo "... src/ClientSession.i"
 	@echo "... src/ClientSession.s"
+	@echo "... src/FFmpegEncoder.o"
+	@echo "... src/FFmpegEncoder.i"
+	@echo "... src/FFmpegEncoder.s"
 	@echo "... src/FrameBuffer.o"
 	@echo "... src/FrameBuffer.i"
 	@echo "... src/FrameBuffer.s"
+	@echo "... src/GStreamerCapture.o"
+	@echo "... src/GStreamerCapture.i"
+	@echo "... src/GStreamerCapture.s"
 	@echo "... src/H264Encoder.o"
 	@echo "... src/H264Encoder.i"
 	@echo "... src/H264Encoder.s"
 	@echo "... src/MediaStreamHandler.o"
 	@echo "... src/MediaStreamHandler.i"
 	@echo "... src/MediaStreamHandler.s"
+	@echo "... src/RTSPServer.o"
+	@echo "... src/RTSPServer.i"
+	@echo "... src/RTSPServer.s"
 	@echo "... src/RequestHandler.o"
 	@echo "... src/RequestHandler.i"
 	@echo "... src/RequestHandler.s"
