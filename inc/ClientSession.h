@@ -26,7 +26,7 @@ class MediaStreamHandler;
 class ClientSession {
 public:
     ClientSession(const std::pair<int, std::string>& newClient);
-    
+
     void StartRequestHandlerThread();
 
     int GetSessionId() const;
@@ -40,11 +40,11 @@ public:
     void SetState(const std::string& newState);
 
 private:
-    
+
     std::shared_ptr<Info> info;
 
     // std::mutex mtx;
-    
+
     RequestHandler* requestHandler;
 };
 

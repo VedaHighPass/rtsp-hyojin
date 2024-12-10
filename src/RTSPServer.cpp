@@ -16,6 +16,7 @@ void RTSPServer::start() {
 
 void RTSPServer::stop() {
     stopFlag = true;
+    TCPHandler::GetInstance().CloseTCPSocket();
     if (serverThread.joinable()) {
         serverThread.join();
     }

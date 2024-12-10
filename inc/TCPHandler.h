@@ -17,6 +17,8 @@ public:
 
     void CreateTCPSocket();
 
+    void CloseTCPSocket();
+
     std::pair<int, std::string> AcceptClientConnection();
 
     std::string ReceiveRTSPRequest(int sessionId);
