@@ -52,7 +52,7 @@ void FFmpegEncoder::initFFmpeg(const std::string& filename, double fps) {
         throw std::runtime_error("Could not open output file");
     }
 
-    AVStream *stream = avformat_new_stream(fmt_ctx, NULL);
+    stream = avformat_new_stream(fmt_ctx, NULL);
     if (!stream) {
         throw std::runtime_error("Could not allocate stream");
     }
@@ -122,6 +122,7 @@ void FFmpegEncoder::encode(const cv::Mat& inputFrame, double fps) {
     }
 
     // 인코딩된 패킷을 가져오기
+    VCImage newframe;
     while ( ret >=  0) {
         ret = avcodec_receive_packet(codec_ctx, packet);
 
@@ -137,13 +138,21 @@ void FFmpegEncoder::encode(const cv::Mat& inputFrame, double fps) {
         // pkt : 인코딩된 비디오또는 오디오 데이터 포함하고있음. 이 데이터를 출력파일에 기록하는것
 //         av_interleaved_write_frame(fmt_ctx, packet);      // 패킷을 파일에 기록
         // 패킷에 할당된 메모리를 해제. 인코딩된 데이터를 파일에 기록한 후 메모리 해제해야함
-
         if (packet->size > 0 && packet->data) {
-            VideoCapture::getInstance().pushImg(packet->data, packet->size);
+            newframe.img = (unsigned char*)packet->data;
+            newframe.size = packet->size;
+            // PTS를 사용하여 초 단위로 변환
+            double seconds = packet->pts * av_q2d(stream->time_base);
+            std::cout << "Time in seconds: " << seconds << std::endl;
+            // 실시간 timestamp 추가
+            auto now = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+            std::cout << "timestamp :" << duration.count()*100 << std::endl;
+            newframe.timestamp = duration.count()*100; // 밀리초 단위 timestamp
+
+            VideoCapture::getInstance().pushImg(newframe);
         }
-
         av_packet_unref(packet);
-
     }
 
 }

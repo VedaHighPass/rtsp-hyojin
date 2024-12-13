@@ -98,30 +98,25 @@ void MediaStreamHandler::HandleMediaStream()
         if (streamState == MediaStreamState::eMediaStream_Play)
         {
 //           std::cout << "SERVER ========== PLAY\n";
-            if(!VideoCapture::getInstance().bufferOpen)
-                VideoCapture::getInstance().bufferOpen = true;  //rtsp 이미지 버퍼 열기
 
             while (!VideoCapture::getInstance().isEmptyBuffer())
             {
-                std::pair<const uint8_t *, int64_t> cur_frame = VideoCapture::getInstance().popImg();
-                const auto ptr_cur_frame = cur_frame.first;
-                const auto cur_frame_size = cur_frame.second;
+                VCImage cur_frame = VideoCapture::getInstance().popImg();
+                const auto ptr_cur_frame = cur_frame.img;
+                const auto cur_frame_size = cur_frame.size;
                 if(ptr_cur_frame == nullptr || cur_frame_size <= 0){
                     std::cout << "Not Ready\n";
                     continue;
                 }
-                // RTP 패킷 전송 (FU-A 분할 포함)
-                //for(int i=0; i<10; i++){
-                //  printf("%x ", ptr_cur_frame[i]);
-                //}
 
                 const int64_t start_code_len = H264Encoder::is_start_code(ptr_cur_frame, cur_frame_size, 4) ? 4 : 3;
+                timestamp = cur_frame.timestamp;
+                std::cout << "pop timestamp:" << timestamp << std::endl;
+
                 SendFragmentedRTPPackets((unsigned char *)ptr_cur_frame + start_code_len, cur_frame_size - start_code_len, rtpPack, timestamp);
                 // 주기적으로 RTCP Sender Report 전송
                 packetCount++;
                 octetCount += cur_frame_size;
-                timestamp += 2005;
-                //delete (ptr_cur_frame);
                 //av_packet_unref(cur_frame); //memory 할당 해제
             }
         }else if(streamState == MediaStreamState::eMediaStream_Pause) {

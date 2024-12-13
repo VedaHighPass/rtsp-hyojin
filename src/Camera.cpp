@@ -992,7 +992,7 @@ void Camera::encodeFrame(const cv::Mat& cpuYUV420p, size_t size) {
         }
 
         if (packet->size > 0 && packet->data) {
-            VideoCapture::getInstance().pushImg(packet->data, packet->size);
+            //VideoCapture::getInstance().pushImg(packet->data, packet->size);
         }
 
         //인코딩된 패킷을 출력파일에 기록한 후 패킷을 해제함(unref)
