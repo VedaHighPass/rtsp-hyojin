@@ -95,7 +95,31 @@ void MediaStreamHandler::HandleMediaStream()
     RtpPacket rtpPack{rtpHeader};
 
     while (true) {
-        if(streamState == MediaStreamState::eMediaStream_Pause) {
+        if (streamState == MediaStreamState::eMediaStream_Play)
+        {
+//           std::cout << "SERVER ========== PLAY\n";
+
+            while (!VideoCapture::getInstance().isEmptyBuffer())
+            {
+                VCImage cur_frame = VideoCapture::getInstance().popImg();
+                const auto ptr_cur_frame = cur_frame.img;
+                const auto cur_frame_size = cur_frame.size;
+                if(ptr_cur_frame == nullptr || cur_frame_size <= 0){
+                    std::cout << "Not Ready\n";
+                    continue;
+                }
+
+                const int64_t start_code_len = H264Encoder::is_start_code(ptr_cur_frame, cur_frame_size, 4) ? 4 : 3;
+                timestamp = cur_frame.timestamp;
+                std::cout << "pop timestamp:" << timestamp << std::endl;
+
+                SendFragmentedRTPPackets((unsigned char *)ptr_cur_frame + start_code_len, cur_frame_size - start_code_len, rtpPack, timestamp);
+                // 주기적으로 RTCP Sender Report 전송
+                packetCount++;
+                octetCount += cur_frame_size;
+                //av_packet_unref(cur_frame); //memory 할당 해제
+            }
+        }else if(streamState == MediaStreamState::eMediaStream_Pause) {
      //       std::cout << "SERVER ========== PAUSE\n";
             std::unique_lock<std::mutex> lck(streamMutex);
             condition.wait(lck);
@@ -104,49 +128,18 @@ void MediaStreamHandler::HandleMediaStream()
    //         std::cout << "SERVER ========== TEARDOWN\n";
             break;
         }
-        else if (streamState == MediaStreamState::eMediaStream_Play)
-        {
- //           std::cout << "SERVER ========== PLAY\n";
-            VideoCapture::getInstance().bufferOpen = true;  //rtsp 이미지 버퍼 열기
-
-            while (1)
-            {
-                while (VideoCapture::getInstance().GetBufferSize() > 0)
-                {
-                    std::cout << "SEND PACKET\n";
-                    //std::pair<const uint8_t *, int64_t> cur_frame = VideoCapture::getInstance().popImg();
-                    AVPacket* cur_frame = VideoCapture::getInstance().popImg();
-                    //const auto ptr_cur_frame = cur_frame.first;
-                    //const auto cur_frame_size = cur_frame.second;
-                    const auto ptr_cur_frame = cur_frame->data;
-                    const auto cur_frame_size = cur_frame->size;
-                    if(ptr_cur_frame == nullptr || cur_frame_size <= 0){
-                      continue;
-                    }
-                    // RTP 패킷 전송 (FU-A 분할 포함)
-                    std::cout <<"test001\n";
-                    for(int i=0; i<10; i++){
-                      printf("%x ", ptr_cur_frame[i]);
-                    }
-
-                    const int64_t start_code_len = H264Encoder::is_start_code(ptr_cur_frame, cur_frame_size, 4) ? 4 : 3;
-                    SendFragmentedRTPPackets((unsigned char *)ptr_cur_frame + start_code_len, cur_frame_size - start_code_len, rtpPack, timestamp);
-
-                    std::cout <<"test002\n";
-                    // 주기적으로 RTCP Sender Report 전송
-                    packetCount++;
-                    octetCount += cur_frame_size;
-                    timestamp += 3000;
-                    //delete (ptr_cur_frame);
-                    av_packet_unref(cur_frame); //memory 할당 해제
-                }
-//                const auto sleepPeriod = uint32_t(1000 * 1000 / 30.0);
-              usleep(10 * 1000);
-            }
-        }
-        usleep(100);
+        usleep(1000*10);
     }
+    threadRun = false;
 }
+
+void MediaStreamHandler::Exit() {
+    while(threadRun){
+      usleep(100);
+    }
+    return;
+}
+
 
 void MediaStreamHandler::SetCmd(const std::string& cmd) {
     std::lock_guard<std::mutex> lock(streamMutex);

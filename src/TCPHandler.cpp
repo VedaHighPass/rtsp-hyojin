@@ -39,6 +39,11 @@ void TCPHandler::CreateTCPSocket() {
     }
 }
 
+void TCPHandler::CloseTCPSocket() {
+    std::cout<< "close Socket";
+    close(tcpSocket);
+}
+
 std::pair<int, std::string> TCPHandler::AcceptClientConnection() {
     socklen_t clientAddrLen = sizeof(tcpAddr);
     int clientSocket = accept(tcpSocket, (sockaddr*)&tcpAddr, &clientAddrLen);
@@ -50,7 +55,7 @@ std::pair<int, std::string> TCPHandler::AcceptClientConnection() {
 
     char clientIP[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &tcpAddr.sin_addr, clientIP, INET_ADDRSTRLEN);
-    
+
     return { clientSocket, clientIP };
 }
 

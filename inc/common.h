@@ -7,7 +7,8 @@
 #define HEIGHT 2464
 #define WIDTH_RESIZE 1920
 #define HEIGHT_RESIZE 1080
-
+// #define WIDTH_RESIZE 960
+// #define HEIGHT_RESIZE 540
 
 #include <cstdint>  // uint64_t 사용을 위한 헤더 추가
 #include <cstdio>   // printf 사용을 위한 헤더 추가
